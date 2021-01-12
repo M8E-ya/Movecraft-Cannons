@@ -1,33 +1,41 @@
 package net.tylers1066.movecraftcannons;
 
+import at.pavlov.cannons.API.CannonsAPI;
 import at.pavlov.cannons.Cannons;
+import at.pavlov.cannons.Enum.MessageEnum;
 import at.pavlov.cannons.cannon.Cannon;
+import at.pavlov.cannons.cannon.CannonManager;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.movecraftcombat.MovecraftCombat;
+import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.CraftType;
 import net.countercraft.movecraft.utils.BitmapHitBox;
+import net.countercraft.movecraft.utils.HitBox;
+import net.countercraft.movecraft.utils.MathUtils;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.listener.ProjectileImpactListener;
 import net.tylers1066.movecraftcannons.listener.RotationListener;
 import net.tylers1066.movecraftcannons.listener.TranslationListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 
 public final class MovecraftCannons extends JavaPlugin {
     private static MovecraftCannons instance;
     private static Cannons cannonsPlugin = null;
+    private static CannonManager cannonManager = null;
 
     public static MovecraftCannons getInstance() {
         return instance;
@@ -72,6 +80,18 @@ public final class MovecraftCannons extends JavaPlugin {
             else {
                 getLogger().info(I18nSupport.getInternationalisedString("Movecraft-Combat not found"));
             }
+        }
+
+        for (CraftType craftType: CraftManager.getInstance().getCraftTypes()) {
+            String craftName = craftType.getCraftName();
+            if (!getConfig().isConfigurationSection("Limits." + craftName)) continue;
+            Map<String, Object> configCraftLimits = getConfig().getConfigurationSection("Limits." + craftName).getValues(false);
+
+            Map<String, Integer> craftLimits = new HashMap<>();
+            for (final Map.Entry<String, Object> entry : configCraftLimits.entrySet()) {
+                craftLimits.put(entry.getKey(), (Integer) entry.getValue());
+            }
+            Config.CraftCannonLimits.put(craftName, craftLimits);
         }
 
         getServer().getPluginManager().registerEvents(new TranslationListener(), this);

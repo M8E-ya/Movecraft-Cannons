@@ -3,3 +3,7 @@ Locale: "en" # Language file to load, currently the plugin comes with en, but yo
 
 # Damage Tracking
 EnableCannonsTracking: true # Enable tracking and recording of Cannons projectiles
+
+Limits:
+  Fighter:
+    FighterGun: 1

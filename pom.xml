@@ -49,21 +49,22 @@
                     <groupId>com.sk89q.worldedit</groupId>
                 </exclusion>
             </exclusions>
-            <scope>provided</scope>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/Cannons.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.countercraft.movecraft</groupId>
             <artifactId>Movecraft</artifactId>
             <version>7.0.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../Movecraft/target/Movecraft.jar</systemPath>
+            <systemPath>${project.basedir}/../target/Movecraft.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.countercraft.movecraft.combat</groupId>
             <artifactId>Movecraft-Combat</artifactId>
             <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../MC-Combat/target/Movecraft-Combat.jar</systemPath>
+            <systemPath>${project.basedir}/../Movecraft-Combat/target/Movecraft-Combat.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
