@@ -13,7 +13,6 @@ import org.bukkit.util.Vector;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class TranslationListener implements Listener {
     @EventHandler
@@ -33,7 +32,7 @@ public class TranslationListener implements Listener {
             }
             else {
                 e.setCancelled(true);
-                e.getCraft().getNotificationPlayer().sendMessage(I18nSupport.getInternationalisedString("Too many cannons"));
+                e.getCraft().getNotificationPlayer().sendMessage(I18nSupport.getInternationalisedString("Disallowed cannon"));
             }
         }
 
