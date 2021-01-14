@@ -31,6 +31,10 @@ public class TranslationListener implements Listener {
             if (Config.CraftCannonLimits.get(e.getCraft().getType().getCraftName()).containsKey(cannonType)) {
                 cannonAmounts.merge(cannonType, 1, Integer::sum);
             }
+            else {
+                e.setCancelled(true);
+                e.getCraft().getNotificationPlayer().sendMessage(I18nSupport.getInternationalisedString("Too many cannons"));
+            }
         }
 
         for (Map.Entry<String, Integer> entry: cannonAmounts.entrySet()) {
