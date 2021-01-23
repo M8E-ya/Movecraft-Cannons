@@ -4,6 +4,59 @@ Locale: "en" # Language file to load, currently the plugin comes with en, but yo
 # Damage Tracking
 EnableCannonsTracking: true # Enable tracking and recording of Cannons projectiles
 
-Limits:
+CannonFirepower:
+  Cannon: 1
+  LargeCannon: 2
+  Mortar: 2
+  57mmArtilleryS: 3
+  57mmArtilleryL: 4
+  240mmArtilleryS: 5
+  240mmArtilleryL: 6
+  NavalGun: 6
+  FighterGun: 1
+  TankCannon: 1
+
+FirepowerLimits:
+  Fighter: 1
+  Tank: 1
+  Cog: 2
+  Caravel: 6
+  EastIndiaman: 12
+  Corvette: 18
+  Destroyer: 24
+  Dreadnought: 24
+  AircraftCarrier: 18
+
+AllowedCannons:
   Fighter:
-    FighterGun: 1
+    - "FighterGun"
+  Cog:
+    - "Cannon"
+  Caravel:
+    - "Cannon"
+    - "LargeCannon"
+  EastIndiaman:
+    - "Cannon"
+    - "LargeCannon"
+  Corvette:
+    - "57mmArtilleryS"
+    - "LargeCannon"
+  Destroyer:
+    - "57mmArtilleryS"
+    - "57mmArtilleryL"
+    - "Mortar"
+  Dreadnought:
+    - "Mortar"
+    - "57mmArtilleryS"
+    - "57mmArtilleryL"
+    - "240mmArtilleryL"
+    - "NavalGun"
+    - "TankCannon"
+  AircraftCarrier:
+    - "Mortar"
+    - "NavalGun"
+    - "57mmArtilleryS"
+    - "57mmArtilleryL"
+    - "TankCannon"
+  Tank:
+    - "TankCannon"
