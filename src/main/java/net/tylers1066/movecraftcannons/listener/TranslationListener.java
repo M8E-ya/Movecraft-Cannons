@@ -6,7 +6,6 @@ import net.countercraft.movecraft.events.CraftPreTranslateEvent;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
@@ -20,14 +19,7 @@ public class TranslationListener implements Listener {
         if (craft.getNotificationPlayer() == null)
             return;
 
-
-        HashSet<Cannon> cannons = new HashSet<>();
-        Bukkit.getServer().getScheduler().runTask(MovecraftCannons.getInstance(), new Runnable(){
-            @Override
-            public void run(){
-                cannons.addAll(MovecraftCannons.getInstance().getCannons(event.getCraft().getHitBox(), event.getCraft().getWorld(), event.getCraft().getNotificationPlayer().getUniqueId()));
-            }
-        });
+        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(event.getCraft().getHitBox(), event.getCraft().getWorld(), event.getCraft().getNotificationPlayer().getUniqueId());
         if (cannons.isEmpty()) return;
 
         String craftName = craft.getType().getCraftName();
