@@ -20,7 +20,8 @@ public class TranslationListener implements Listener {
         if (craft.getNotificationPlayer() == null)
             return;
 
-        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), event.getCraft().getW(), event.getCraft().getNotificationPlayer().getUniqueId());
+        //HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), event.getCraft().getW(), event.getCraft().getNotificationPlayer().getUniqueId());
+        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(event.getCraft().getHitBox(), event.getCraft().getWorld(), event.getCraft().getNotificationPlayer().getUniqueId());
         if (cannons.isEmpty()) return;
 
         String craftName = craft.getType().getCraftName();
@@ -34,6 +35,7 @@ public class TranslationListener implements Listener {
                 craft.getNotificationPlayer().sendMessage(String.format(I18nSupport.getInternationalisedString("Disallowed cannon"), cannonName));
                 return;
             }
+
             craftFirepower = craftFirepower + Config.CannonFirepowerValues.get(cannonName);
         }
 
