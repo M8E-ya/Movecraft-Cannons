@@ -20,8 +20,14 @@ public class TranslationListener implements Listener {
         if (craft.getNotificationPlayer() == null)
             return;
 
-        //HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), event.getCraft().getW(), event.getCraft().getNotificationPlayer().getUniqueId());
-        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(event.getCraft().getHitBox(), event.getCraft().getWorld(), event.getCraft().getNotificationPlayer().getUniqueId());
+
+        HashSet<Cannon> cannons = new HashSet<>();
+        Bukkit.getServer().getScheduler().runTask(MovecraftCannons.getInstance(), new Runnable(){
+            @Override
+            public void run(){
+                cannons.addAll(MovecraftCannons.getInstance().getCannons(event.getCraft().getHitBox(), event.getCraft().getWorld(), event.getCraft().getNotificationPlayer().getUniqueId()));
+            }
+        });
         if (cannons.isEmpty()) return;
 
         String craftName = craft.getType().getCraftName();

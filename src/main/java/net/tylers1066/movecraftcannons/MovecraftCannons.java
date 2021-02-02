@@ -1,18 +1,14 @@
 package net.tylers1066.movecraftcannons;
 
-import at.pavlov.cannons.API.CannonsAPI;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.cannon.CannonDesign;
 import at.pavlov.cannons.cannon.CannonManager;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.movecraftcombat.MovecraftCombat;
-import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.CraftType;
 import net.countercraft.movecraft.utils.BitmapHitBox;
-import net.countercraft.movecraft.utils.HitBox;
-import net.countercraft.movecraft.utils.MathUtils;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.listener.ProjectileImpactListener;
 import net.tylers1066.movecraftcannons.listener.RotationListener;
@@ -119,17 +115,6 @@ public final class MovecraftCannons extends JavaPlugin {
     public void onDisable() {
         // Plugin shutdown logic
     }
-
-    /*
-    public HashSet<Cannon> getCannons(@NotNull BitmapHitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
-        List<Location> shipLocations = new ArrayList<>();
-        for (MovecraftLocation loc : hitbox) {
-            shipLocations.add(loc.toBukkit(world));
-        }
-        return cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
-    }
-     */
-
 
     public HashSet<Cannon> getCannons(@NotNull BitmapHitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
         List<Location> shipLocations = new ArrayList<>();
