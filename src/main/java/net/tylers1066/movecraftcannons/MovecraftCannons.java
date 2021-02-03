@@ -1,5 +1,6 @@
 package net.tylers1066.movecraftcannons;
 
+import at.pavlov.cannons.API.CannonsAPI;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.Enum.BreakCause;
 import at.pavlov.cannons.cannon.Cannon;
@@ -124,19 +125,17 @@ public final class MovecraftCannons extends JavaPlugin {
         }
 
         HashSet<Cannon> cannonList = cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
-        HashSet<Cannon> ghostCannonList = new HashSet<>();
 
-        for (Cannon cannon: cannonList) {
+        Iterator<Cannon> iter = cannonList.iterator();
+        while (iter.hasNext()) {
+            Cannon cannon = iter.next();
             if (cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial()) {
-                cannon.setValid(false);
-                ghostCannonList.add(cannon);
+                iter.remove();
+                cannonManager.removeCannon(cannon, false, false, BreakCause.Other);
             }
         }
-
-        cannonList.removeAll(ghostCannonList);
         return cannonList;
     }
-
 }
 
 
