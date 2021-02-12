@@ -2,15 +2,18 @@ package net.tylers1066.movecraftcannons;
 
 import at.pavlov.cannons.API.CannonsAPI;
 import at.pavlov.cannons.Cannons;
-import at.pavlov.cannons.Enum.BreakCause;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.cannon.CannonDesign;
 import at.pavlov.cannons.cannon.CannonManager;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.movecraftcombat.MovecraftCombat;
+import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.CraftType;
 import net.countercraft.movecraft.utils.BitmapHitBox;
+import net.countercraft.movecraft.utils.HitBox;
+import net.countercraft.movecraft.utils.MathUtils;
+import net.tylers1066.movecraftcannons.aiming.AimingCommand;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.listener.ProjectileImpactListener;
 import net.tylers1066.movecraftcannons.listener.RotationListener;
@@ -111,6 +114,7 @@ public final class MovecraftCannons extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new TranslationListener(), this);
         getServer().getPluginManager().registerEvents(new RotationListener(), this);
+        this.getCommand("aim").setExecutor(new AimingCommand());
     }
 
     @Override
@@ -130,12 +134,33 @@ public final class MovecraftCannons extends JavaPlugin {
         while (iter.hasNext()) {
             Cannon cannon = iter.next();
             if (cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial()) {
+                //cannonManager.removeCannon(cannon, false, false, BreakCause.Other); <- Causes NPE?
+                cannon.setValid(false);
                 iter.remove();
-                cannonManager.removeCannon(cannon, false, false, BreakCause.Other);
             }
         }
         return cannonList;
     }
+
+    public Set<Cannon> getExistingCannonsInHitbox(HitBox hitBox, World world) {
+        Set<Cannon> foundCannons = new HashSet<>();
+        for (Cannon can : CannonsAPI.getCannonsInBox(hitBox.getMidPoint().toBukkit(world), hitBox.getXLength(), hitBox.getYLength(), hitBox.getZLength())) {
+            for (Location barrelLoc : can.getCannonDesign().getBarrelBlocks(can)) {
+                if (!hitBox.contains(MathUtils.bukkit2MovecraftLoc(barrelLoc))) {
+                    continue;
+                }
+                foundCannons.add(can);
+                break;
+            }
+        }
+        foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());
+        return foundCannons;
+    }
+
+    public Set<Cannon> getExistingCannonsOnCraft(Craft c) {
+        return getExistingCannonsInHitbox(c.getHitBox(), c.getWorld());
+    }
+
 }
 
 

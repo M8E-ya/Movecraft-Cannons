@@ -6,3 +6,6 @@ depend: [Movecraft, Cannons]
 softdepend: [Movecraft-Combat]
 authors: [TylerS1066]
 description: Integration between Movecraft-Combat and Cannons
+commands:
+  aim:
+    description: Aim cannons facing in the direction you are looking at while on a ship.
