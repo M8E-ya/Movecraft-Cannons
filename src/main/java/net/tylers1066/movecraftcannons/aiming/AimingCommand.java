@@ -10,6 +10,7 @@ import net.countercraft.movecraft.craft.Craft;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
@@ -47,8 +48,8 @@ public class AimingCommand implements CommandExecutor {
             return false;
         }
 
-        HashSet<Cannon> cannonList = (HashSet<Cannon>) MovecraftCannons.getInstance().getExistingCannonsOnCraft(craft);
-        cannonList.removeIf(cannon -> cannon.getCannonDirection() != getCardinalDirection(player));
+        HashSet<Cannon> cannonList = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), player.getUniqueId());
+        cannonList.removeIf(cannon -> cannon.getCannonDirection() != player.getFacing());
         if (cannonList.isEmpty()) {
             player.sendMessage(I18nSupport.getInternationalisedString("No cannons to aim"));
             return false;
@@ -59,14 +60,9 @@ public class AimingCommand implements CommandExecutor {
         GunAngles angles;
 
         for (Cannon cannon : cannonList) {
-            if (!cannon.canAimPitch(eyeLocation.getPitch())) {
-                continue;
-            }
-            if (!cannon.canAimYaw(eyeLocation.getYaw())) {
-                continue;
-            }
             angles = getGunAngle(cannon, eyeLocation.getYaw(), eyeLocation.getPitch());
             cannon.setVerticalAngle(angles.getVertical());
+            Bukkit.broadcastMessage("Horizontal " + angles.getHorizontal());
             cannon.setHorizontalAngle(angles.getHorizontal());
 
             aiming.showAimingVector(cannon, player);
@@ -75,20 +71,6 @@ public class AimingCommand implements CommandExecutor {
         }
         player.sendMessage(String.format(I18nSupport.getInternationalisedString("Changed aim"), i));
         return true;
-    }
-
-    public static BlockFace getCardinalDirection(Player player) {
-        float yaw = player.getEyeLocation().getYaw();
-        yaw = (yaw % 360 + 360) % 360; // True modulo, as Java's modulo is weird for negative values
-        if (yaw > 135 || yaw < -135) {
-            return BlockFace.NORTH;
-        } else if (yaw < -45) {
-            return BlockFace.EAST;
-        } else if (yaw > 45) {
-            return BlockFace.WEST;
-        } else {
-            return BlockFace.SOUTH;
-        }
     }
 
     private static class GunAngles
@@ -134,6 +116,9 @@ public class AimingCommand implements CommandExecutor {
         while (horizontal < -180)
             horizontal = horizontal + 360;
 
-        return new GunAngles(horizontal, -pitch - cannon.getTotalVerticalAngle());
+        if (horizontal > 150) {
+            horizontal = -horizontal;
+        }
+        return new GunAngles(horizontal / 2, -pitch);
     }
 }
