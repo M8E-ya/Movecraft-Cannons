@@ -10,9 +10,7 @@ import net.countercraft.movecraft.craft.Craft;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -62,7 +60,6 @@ public class AimingCommand implements CommandExecutor {
         for (Cannon cannon : cannonList) {
             angles = getGunAngle(cannon, eyeLocation.getYaw(), eyeLocation.getPitch());
             cannon.setVerticalAngle(angles.getVertical());
-            Bukkit.broadcastMessage("Horizontal " + angles.getHorizontal());
             cannon.setHorizontalAngle(angles.getHorizontal());
 
             aiming.showAimingVector(cannon, player);
@@ -116,9 +113,6 @@ public class AimingCommand implements CommandExecutor {
         while (horizontal < -180)
             horizontal = horizontal + 360;
 
-        if (horizontal > 150) {
-            horizontal = -horizontal;
-        }
-        return new GunAngles(horizontal / 2, -pitch);
+        return new GunAngles(horizontal / 1.5, -pitch);
     }
 }

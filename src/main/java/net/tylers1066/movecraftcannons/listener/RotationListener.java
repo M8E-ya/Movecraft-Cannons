@@ -7,7 +7,7 @@ import net.tylers1066.movecraftcannons.MovecraftCannons;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
-import java.util.HashSet;
+
 import java.util.Set;
 
 
@@ -17,7 +17,7 @@ public class RotationListener implements Listener {
         if(e.getCraft().getNotificationPlayer() == null)
             return;
 
-        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(e.getCraft().getHitBox(), e.getCraft().getWorld(), e.getCraft().getNotificationPlayer().getUniqueId());
+        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannonsInHitBox(e.getCraft().getHitBox(), e.getCraft().getWorld());
         if (cannons.isEmpty()) return;
 
         Vector v = e.getOriginPoint().toBukkit(e.getCraft().getW()).toVector();

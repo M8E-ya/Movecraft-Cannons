@@ -15,6 +15,7 @@ import net.countercraft.movecraft.utils.HitBox;
 import net.countercraft.movecraft.utils.MathUtils;
 import net.tylers1066.movecraftcannons.aiming.AimingCommand;
 import net.tylers1066.movecraftcannons.config.Config;
+import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.listener.ProjectileImpactListener;
 import net.tylers1066.movecraftcannons.listener.RotationListener;
 import net.tylers1066.movecraftcannons.listener.TranslationListener;
@@ -114,6 +115,7 @@ public final class MovecraftCannons extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new TranslationListener(), this);
         getServer().getPluginManager().registerEvents(new RotationListener(), this);
+        getServer().getPluginManager().registerEvents(new DetectionListener(), this);
         this.getCommand("aim").setExecutor(new AimingCommand());
     }
 
@@ -127,22 +129,10 @@ public final class MovecraftCannons extends JavaPlugin {
         for(MovecraftLocation loc : hitbox) {
             shipLocations.add(loc.toBukkit(world));
         }
-
-        HashSet<Cannon> cannonList = cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
-
-        Iterator<Cannon> iter = cannonList.iterator();
-        while (iter.hasNext()) {
-            Cannon cannon = iter.next();
-            if (cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial()) {
-                //cannonManager.removeCannon(cannon, false, false, BreakCause.Other); <- Causes NPE?
-                cannon.setValid(false);
-                iter.remove();
-            }
-        }
-        return cannonList;
+        return cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
     }
 
-    public Set<Cannon> getExistingCannonsInHitbox(HitBox hitBox, World world) {
+    public Set<Cannon> getCannonsInHitBox(HitBox hitBox, World world) {
         Set<Cannon> foundCannons = new HashSet<>();
         for (Cannon can : CannonsAPI.getCannonsInBox(hitBox.getMidPoint().toBukkit(world), hitBox.getXLength(), hitBox.getYLength(), hitBox.getZLength())) {
             for (Location barrelLoc : can.getCannonDesign().getBarrelBlocks(can)) {
@@ -153,12 +143,14 @@ public final class MovecraftCannons extends JavaPlugin {
                 break;
             }
         }
-        foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());
+        // This removes ghost cannons, but this is currently not necessary in our code.
+        // We don't care if we're fetching ghost cannons since we only need to calculate firepower when the ship is initially detected.
+        //foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());
         return foundCannons;
     }
 
-    public Set<Cannon> getExistingCannonsOnCraft(Craft c) {
-        return getExistingCannonsInHitbox(c.getHitBox(), c.getWorld());
+    public Set<Cannon> getCannonsInCraftHitBox(Craft c) {
+        return getCannonsInHitBox(c.getHitBox(), c.getWorld());
     }
 
 }
