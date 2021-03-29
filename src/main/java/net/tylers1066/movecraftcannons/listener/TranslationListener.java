@@ -17,7 +17,7 @@ public class TranslationListener implements Listener {
         if (craft.getNotificationPlayer() == null)
             return;
 
-        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannonsInHitBox(e.getCraft().getHitBox(), e.getCraft().getWorld());
+        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannonsInCraftHitBox(e.getCraft());
 
         for (Cannon c: cannons) {
             c.move(new Vector(e.getDx(), e.getDy(), e.getDz()));

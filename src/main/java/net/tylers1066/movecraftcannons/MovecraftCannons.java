@@ -129,6 +129,8 @@ public final class MovecraftCannons extends JavaPlugin {
         for(MovecraftLocation loc : hitbox) {
             shipLocations.add(loc.toBukkit(world));
         }
+        Set<Cannon> foundCannons = cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
+        foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());
         return cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
     }
 
@@ -143,9 +145,8 @@ public final class MovecraftCannons extends JavaPlugin {
                 break;
             }
         }
-        // This removes ghost cannons, but this is currently not necessary in our code.
-        // We don't care if we're fetching ghost cannons since we only need to calculate firepower when the ship is initially detected.
-        //foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());
+
+        foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());
         return foundCannons;
     }
 

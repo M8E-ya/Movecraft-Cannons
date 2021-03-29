@@ -17,7 +17,7 @@ public class RotationListener implements Listener {
         if(e.getCraft().getNotificationPlayer() == null)
             return;
 
-        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannonsInHitBox(e.getCraft().getHitBox(), e.getCraft().getWorld());
+        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannonsInCraftHitBox(e.getCraft());
         if (cannons.isEmpty()) return;
 
         Vector v = e.getOriginPoint().toBukkit(e.getCraft().getW()).toVector();
