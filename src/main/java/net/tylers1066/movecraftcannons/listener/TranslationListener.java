@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class TranslationListener implements Listener {
     @EventHandler
@@ -17,7 +17,7 @@ public class TranslationListener implements Listener {
         if (craft.getNotificationPlayer() == null)
             return;
 
-        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(e.getCraft().getHitBox(), e.getCraft().getW(), e.getCraft().getNotificationPlayer().getUniqueId());
+        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannonsInHitBox(e.getCraft().getHitBox(), e.getCraft().getWorld());
 
         for (Cannon c: cannons) {
             c.move(new Vector(e.getDx(), e.getDy(), e.getDz()));
