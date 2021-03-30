@@ -38,7 +38,7 @@ public class DetectionListener implements Listener {
 
             craftFirepower = craftFirepower + Config.CannonFirepowerValues.get(cannonName);
             if (craftFirepower > maximumFirepower) {
-                event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Too much firepower"), craftFirepower));
+                event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Too much firepower"), maximumFirepower));
                 event.setCancelled(true);
                 return;
             }
