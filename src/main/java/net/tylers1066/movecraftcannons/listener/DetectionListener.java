@@ -6,10 +6,11 @@ import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class DetectionListener implements Listener {
 
@@ -20,22 +21,23 @@ public class DetectionListener implements Listener {
             return;
         }
 
-        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), craft.getNotificationPlayer().getUniqueId());
+        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), craft.getNotificationPlayer().getUniqueId());
         if (cannons.isEmpty()) return;
 
         String craftName = craft.getType().getCraftName();
         int craftFirepower = 0;
+        int maximumFirepower = Config.CraftFirepowerLimits.get(craftName);
 
         for (Cannon cannon: cannons) {
             String cannonName = cannon.getCannonDesign().getDesignName();
             if (!Config.CraftAllowedCannons.get(craftName).contains(cannonName)) {
-                event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Disallowed cannon"), craftFirepower));
+                event.setFailMessage(I18nSupport.getInternationalisedString("Disallowed cannon"));
                 event.setCancelled(true);
                 return;
             }
 
             craftFirepower = craftFirepower + Config.CannonFirepowerValues.get(cannonName);
-            if (craftFirepower > Config.CraftFirepowerLimits.get(craftName)) {
+            if (craftFirepower > maximumFirepower) {
                 event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Too much firepower"), craftFirepower));
                 event.setCancelled(true);
                 return;

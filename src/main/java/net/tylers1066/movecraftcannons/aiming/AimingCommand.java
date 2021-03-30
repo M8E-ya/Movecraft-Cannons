@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class AimingCommand implements CommandExecutor {
 
@@ -46,7 +47,7 @@ public class AimingCommand implements CommandExecutor {
             return false;
         }
 
-        HashSet<Cannon> cannonList = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), player.getUniqueId());
+        Set<Cannon> cannonList = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), player.getUniqueId());
         cannonList.removeIf(cannon -> cannon.getCannonDirection() != player.getFacing());
         if (cannonList.isEmpty()) {
             player.sendMessage(I18nSupport.getInternationalisedString("No cannons to aim"));

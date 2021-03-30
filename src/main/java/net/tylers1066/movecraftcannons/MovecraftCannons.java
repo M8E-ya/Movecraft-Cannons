@@ -124,14 +124,14 @@ public final class MovecraftCannons extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public HashSet<Cannon> getCannons(@NotNull BitmapHitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
+    public Set<Cannon> getCannons(@NotNull BitmapHitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
         List<Location> shipLocations = new ArrayList<>();
         for(MovecraftLocation loc : hitbox) {
             shipLocations.add(loc.toBukkit(world));
         }
         Set<Cannon> foundCannons = cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
         foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());
-        return cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
+        return foundCannons;
     }
 
     public Set<Cannon> getCannonsInHitBox(HitBox hitBox, World world) {
