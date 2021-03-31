@@ -20,6 +20,7 @@ import net.tylers1066.movecraftcannons.listener.ProjectileImpactListener;
 import net.tylers1066.movecraftcannons.listener.RotationListener;
 import net.tylers1066.movecraftcannons.listener.TranslationListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -113,9 +114,9 @@ public final class MovecraftCannons extends JavaPlugin {
             Config.CannonFirepowerValues.put(cannonName, getConfig().getInt("CannonFirepower." + cannonName, 0));
         }
 
+        getServer().getPluginManager().registerEvents(new DetectionListener(), this);
         getServer().getPluginManager().registerEvents(new TranslationListener(), this);
         getServer().getPluginManager().registerEvents(new RotationListener(), this);
-        getServer().getPluginManager().registerEvents(new DetectionListener(), this);
         this.getCommand("aim").setExecutor(new AimingCommand());
     }
 
@@ -124,13 +125,29 @@ public final class MovecraftCannons extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public Set<Cannon> getCannons(@NotNull BitmapHitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
+    public HashSet<Cannon> getCannons(@NotNull BitmapHitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
         List<Location> shipLocations = new ArrayList<>();
         for(MovecraftLocation loc : hitbox) {
             shipLocations.add(loc.toBukkit(world));
         }
-        Set<Cannon> foundCannons = cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
+
+        // Remove ghost cannons
+        HashSet<Cannon> foundCannons = cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
         foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());
+
+        // Remove duplicate cannons
+        List<Location> cannonLocations = new ArrayList<>();
+        Iterator<Cannon> iter = foundCannons.iterator();
+        while (iter.hasNext()) {
+            Cannon cannon = iter.next();
+            Location firingTriggerLocation = cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getLocation();
+            if (cannonLocations.contains(firingTriggerLocation)) {
+                cannon.setValid(false);
+                iter.remove();
+                continue;
+            }
+            cannonLocations.add(firingTriggerLocation);
+        }
         return foundCannons;
     }
 
