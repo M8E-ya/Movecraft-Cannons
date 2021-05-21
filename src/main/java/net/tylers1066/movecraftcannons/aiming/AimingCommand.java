@@ -48,7 +48,7 @@ public class AimingCommand implements CommandExecutor {
         }
 
         Set<Cannon> cannonList = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), player.getUniqueId());
-        cannonList.removeIf(cannon -> cannon.getCannonDirection() != player.getFacing());
+        //cannonList.removeIf(cannon -> cannon.getCannonDirection() != player.getFacing());
         if (cannonList.isEmpty()) {
             player.sendMessage(I18nSupport.getInternationalisedString("No cannons to aim"));
             return false;
@@ -59,6 +59,9 @@ public class AimingCommand implements CommandExecutor {
         GunAngles angles;
 
         for (Cannon cannon : cannonList) {
+            if (!cannon.canAimPitch(eyeLocation.getPitch()) || !cannon.canAimYaw(eyeLocation.getYaw())) {
+                continue;
+            }
             angles = getGunAngle(cannon, eyeLocation.getYaw(), eyeLocation.getPitch());
             cannon.setVerticalAngle(angles.getVertical());
             cannon.setHorizontalAngle(angles.getHorizontal());
@@ -109,11 +112,11 @@ public class AimingCommand implements CommandExecutor {
      */
     private GunAngles getGunAngle(Cannon cannon, double yaw, double pitch)
     {
-        double horizontal = yaw - CannonsUtil.directionToYaw(cannon.getCannonDirection()) - cannon.getTotalHorizontalAngle();
+        double horizontal = yaw - CannonsUtil.directionToYaw(cannon.getCannonDirection());
         horizontal = horizontal % 360;
         while (horizontal < -180)
             horizontal = horizontal + 360;
 
-        return new GunAngles(horizontal / 1.5, -pitch);
+        return new GunAngles(horizontal, -pitch);
     }
 }
