@@ -4,7 +4,7 @@ import at.pavlov.cannons.Aiming;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.utils.CannonsUtil;
-import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Resident;
 import net.countercraft.movecraft.craft.Craft;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
@@ -17,7 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class AimingCommand implements CommandExecutor {
@@ -37,7 +36,7 @@ public class AimingCommand implements CommandExecutor {
             return false;
         }
 
-        Resident resident = TownyAPI.getInstance().getResident(player.getUniqueId());
+        Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
         if (resident == null) {
             return false;
         }

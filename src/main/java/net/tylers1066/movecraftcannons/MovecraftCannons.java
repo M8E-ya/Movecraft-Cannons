@@ -131,6 +131,7 @@ public final class MovecraftCannons extends JavaPlugin {
             shipLocations.add(loc.toBukkit(world));
         }
 
+
         // Remove ghost cannons
         HashSet<Cannon> foundCannons = cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
         foundCannons.removeIf(cannon -> cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getType() != cannon.getCannonDesign().getSchematicBlockTypeRightClickTrigger().getMaterial());

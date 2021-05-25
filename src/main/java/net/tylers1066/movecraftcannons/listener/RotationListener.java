@@ -20,11 +20,12 @@ public class RotationListener implements Listener {
         if (craft.getNotificationPlayer() == null)
             return;
 
-        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), craft.getNotificationPlayer().getUniqueId());
-        if (cannons.isEmpty()) return;
+        if (DetectionListener.cannonsOnCraft.get(craft) == null) {
+            return;
+        }
 
         Vector v = event.getOriginPoint().toBukkit(craft.getWorld()).toVector();
-        for (Cannon c : cannons) {
+        for (Cannon c: DetectionListener.cannonsOnCraft.get(craft)) {
             if (event.getRotation() == Rotation.CLOCKWISE) {
                 c.rotateRight(v);
             }
