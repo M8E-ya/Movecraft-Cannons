@@ -8,12 +8,14 @@ import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.HashMap;
 import java.util.Set;
+import java.util.UUID;
 
 public class DetectionListener implements Listener {
 
@@ -22,13 +24,15 @@ public class DetectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
-        if (craft.getNotificationPlayer() == null) {
+        if (craft.getAudience() == null) {
             return;
         }
 
-        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), craft.getNotificationPlayer().getUniqueId());
-        if (cannons.isEmpty())
+        UUID pilotUUID = ((Player) craft.getAudience()).getUniqueId();
+        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), pilotUUID);
+        if (cannons.isEmpty()) {
             return;
+        }
 
         String craftName = craft.getType().getCraftName();
         int craftFirepower = 0;
