@@ -12,8 +12,9 @@ public class TranslationListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void translateListener(CraftPostTranslateEvent event) {
         Craft craft = event.getCraft();
-        if (craft.getNotificationPlayer() == null)
+        if (craft.getAudience() == null) {
             return;
+        }
 
         if (DetectionListener.cannonsOnCraft.get(craft) == null) {
             return;
