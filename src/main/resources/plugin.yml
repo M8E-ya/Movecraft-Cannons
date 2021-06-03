@@ -1,11 +1,11 @@
 name: Movecraft-Cannons
 version: ${project.version}
 main: net.tylers1066.movecraftcannons.MovecraftCannons
-api-version: 1.13
+api-version: 1.14
 depend: [Movecraft, Cannons]
 softdepend: [Movecraft-Combat]
 authors: [TylerS1066]
-description: Integration between Movecraft-Combat and Cannons
+description: Integration between Movecraft and Cannons
 commands:
   aim:
     description: Aim cannons facing in the direction you are looking at while on a ship.

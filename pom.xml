@@ -6,7 +6,7 @@
 
     <groupId>net.TylerS1066.Movecraft-Cannons</groupId>
     <artifactId>Movecraft-Cannons</artifactId>
-    <version>0.1.1</version>
+    <version>1.a.0</version>
     <packaging>jar</packaging>
 
     <name>Movecraft-Cannons</name>
@@ -59,9 +59,9 @@
         <dependency>
             <groupId>net.countercraft.movecraft</groupId>
             <artifactId>Movecraft</artifactId>
-            <version>7.0.0</version>
+            <version>LATEST</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../target/Movecraft.jar</systemPath>
+            <systemPath>${project.basedir}/../Movecraft/target/Movecraft.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>net.countercraft.movecraft.combat</groupId>

@@ -10,10 +10,8 @@ import net.countercraft.movecraft.combat.movecraftcombat.MovecraftCombat;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.CraftType;
-import net.countercraft.movecraft.utils.BitmapHitBox;
-import net.countercraft.movecraft.utils.HitBox;
-import net.countercraft.movecraft.utils.MathUtils;
 import net.tylers1066.movecraftcannons.aiming.AimingCommand;
+import net.countercraft.movecraft.util.hitboxes.HitBox;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.listener.ProjectileImpactListener;
@@ -156,7 +154,7 @@ public final class MovecraftCannons extends JavaPlugin {
         Set<Cannon> foundCannons = new HashSet<>();
         for (Cannon can : CannonsAPI.getCannonsInBox(hitBox.getMidPoint().toBukkit(world), hitBox.getXLength(), hitBox.getYLength(), hitBox.getZLength())) {
             for (Location barrelLoc : can.getCannonDesign().getBarrelBlocks(can)) {
-                if (!hitBox.contains(MathUtils.bukkit2MovecraftLoc(barrelLoc))) {
+                if (!hitBox.contains(MathUtil.bukkit2MovecraftLoc(barrelLoc))) {
                     continue;
                 }
                 foundCannons.add(can);
