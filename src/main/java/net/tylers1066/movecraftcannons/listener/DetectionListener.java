@@ -13,7 +13,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import javax.print.attribute.HashAttributeSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,14 +23,18 @@ public class DetectionListener implements Listener {
 
     public static HashMap<Craft, Set<Cannon>> cannonsOnCraft = new HashMap<>();
 
+    /*
+    CraftDetectEvent is currently not called in Movecraft 8.
+    See TranslationListener for a workaround.
+     */
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
-        if (craft.getAudience() == null) {
+        if (craft.getNotificationPlayer() == null) {
             return;
         }
 
-        UUID pilotUUID = ((Player) craft.getAudience()).getUniqueId();
+        UUID pilotUUID = craft.getNotificationPlayer().getUniqueId();
         Set<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), pilotUUID);
         if (cannons.isEmpty()) {
             return;

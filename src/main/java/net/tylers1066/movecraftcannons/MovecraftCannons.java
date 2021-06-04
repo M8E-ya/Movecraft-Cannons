@@ -126,10 +126,9 @@ public final class MovecraftCannons extends JavaPlugin {
 
     public HashSet<Cannon> getCannons(@NotNull HitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
         List<Location> shipLocations = new ArrayList<>();
-        for(MovecraftLocation loc : hitbox) {
+        for (MovecraftLocation loc : hitbox) {
             shipLocations.add(loc.toBukkit(world));
         }
-
 
         // Remove ghost cannons
         HashSet<Cannon> foundCannons = cannonsPlugin.getCannonsAPI().getCannons(shipLocations, uuid, true);
