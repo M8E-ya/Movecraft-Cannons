@@ -13,11 +13,11 @@ import org.bukkit.entity.Player;
 public class MovecraftUtils {
 
     public static boolean isFriendly(Resident resident, Craft craft) {
-        if (craft.getAudience() == null) {
+        Player pilot = craft.getNotificationPlayer();
+        if (pilot == null) {
             return false;
         }
 
-        Player pilot = (Player) craft.getAudience();
         Resident pilotResident;
         Town pilotTown;
         Town residentTown;

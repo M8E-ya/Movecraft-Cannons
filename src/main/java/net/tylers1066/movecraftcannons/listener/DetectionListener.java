@@ -2,6 +2,7 @@ package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.cannon.Cannon;
 import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
@@ -30,11 +31,11 @@ public class DetectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
-        if (craft.getNotificationPlayer() == null) {
+        if (!(craft instanceof PlayerCraft)) {
             return;
         }
 
-        UUID pilotUUID = craft.getNotificationPlayer().getUniqueId();
+        UUID pilotUUID = ((PlayerCraft) craft).getPlayer().getUniqueId();
         Set<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), pilotUUID);
         if (cannons.isEmpty()) {
             return;
