@@ -24,10 +24,7 @@ public class DetectionListener implements Listener {
 
     public static HashMap<Craft, Set<Cannon>> cannonsOnCraft = new HashMap<>();
 
-    /*
-    CraftDetectEvent is currently not called in Movecraft 8.
-    See TranslationListener for a workaround.
-     */
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();

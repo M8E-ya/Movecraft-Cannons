@@ -1,17 +1,14 @@
 package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.cannon.Cannon;
-import net.countercraft.movecraft.Rotation;
+import net.countercraft.movecraft.MovecraftRotation;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.events.CraftRotateEvent;
-import net.tylers1066.movecraftcannons.MovecraftCannons;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
-
-import java.util.Set;
 
 
 public class RotationListener implements Listener {
@@ -28,10 +25,10 @@ public class RotationListener implements Listener {
 
         Vector v = event.getOriginPoint().toBukkit(craft.getWorld()).toVector();
         for (Cannon c: DetectionListener.cannonsOnCraft.get(craft)) {
-            if (event.getRotation() == Rotation.CLOCKWISE) {
+            if (event.getRotation() == MovecraftRotation.CLOCKWISE) {
                 c.rotateRight(v);
             }
-            else if (event.getRotation() == Rotation.ANTICLOCKWISE) {
+            else if (event.getRotation() == MovecraftRotation.ANTICLOCKWISE) {
                 c.rotateLeft(v);
             }
         }
