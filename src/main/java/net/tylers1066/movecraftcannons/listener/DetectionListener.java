@@ -28,7 +28,8 @@ public class DetectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
-        if (!(craft instanceof PlayerCraft)) {
+        String craftName = craft.getType().getCraftName();
+        if (!Config.CraftAllowedCannons.containsKey(craftName)) {
             return;
         }
 
@@ -38,7 +39,6 @@ public class DetectionListener implements Listener {
             return;
         }
 
-        String craftName = craft.getType().getCraftName();
         int craftFirepower = 0;
         int maximumFirepower = Config.CraftFirepowerLimits.get(craftName);
 
