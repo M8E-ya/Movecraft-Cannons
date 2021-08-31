@@ -29,6 +29,9 @@ public class DetectionListener implements Listener {
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
         String craftName = craft.getType().getCraftName();
+        if (!(craft instanceof PlayerCraft)) {
+            return;
+        }
         if (!Config.CraftAllowedCannons.containsKey(craftName)) {
             return;
         }
