@@ -8,6 +8,7 @@ import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Resident;
 import net.countercraft.movecraft.craft.Craft;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
+import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
 import org.bukkit.Location;
@@ -46,9 +47,9 @@ public class AimingCommand implements CommandExecutor {
             return false;
         }
 
-        Set<Cannon> cannonList = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), player.getUniqueId());
+        Set<Cannon> cannonList = DetectionListener.cannonsOnCraft.get(craft);
         //cannonList.removeIf(cannon -> cannon.getCannonDirection() != player.getFacing());
-        if (cannonList.isEmpty()) {
+        if (cannonList == null || cannonList.isEmpty()) {
             player.sendMessage(I18nSupport.getInternationalisedString("No cannons to aim"));
             return false;
         }
