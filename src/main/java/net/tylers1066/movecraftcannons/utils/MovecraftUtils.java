@@ -1,39 +1,28 @@
 package net.tylers1066.movecraftcannons.utils;
 
 import com.palmergames.bukkit.towny.TownyAPI;
-import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Resident;
-import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.utils.CombatUtil;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.util.MathUtils;
 import org.bukkit.entity.Player;
 
 public class MovecraftUtils {
 
-    public static boolean isFriendly(Resident resident, Craft craft) {
-        Player pilot = craft.getNotificationPlayer();
-        if (pilot == null) {
+    public static boolean isFriendly(Resident resident, PlayerCraft craft) {
+        Resident pilotResident = TownyAPI.getInstance().getResident(craft.getPlayer().getUniqueId());
+        if (pilotResident == null) {
             return false;
         }
-
-        Resident pilotResident;
-        Town pilotTown;
-        Town residentTown;
-        try {
-            pilotResident = TownyAPI.getInstance().getResident(pilot.getUniqueId());
-            if (pilotResident == null) {
-                return false;
-            }
-            pilotTown = pilotResident.getTown();
-            residentTown = resident.getTown();
-        }
-        catch (NotRegisteredException ex) {
-            return false;
+        if (resident.equals(pilotResident)) {
+            return true;
         }
 
-        return CombatUtil.isSameTown(resident, pilotResident) || CombatUtil.isSameNation(residentTown, pilotTown) || CombatUtil.isAlly(residentTown, pilotTown);
+        return CombatUtil.isSameTown(resident, pilotResident)
+                || CombatUtil.isSameNation(resident, pilotResident)
+                || CombatUtil.isAlly(resident.getName(), pilotResident.getName());
     }
 
     public static Craft getCurrentShip(Player player) {

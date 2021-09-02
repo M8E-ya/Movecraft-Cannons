@@ -7,6 +7,7 @@ import at.pavlov.cannons.utils.CannonsUtil;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Resident;
 import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
@@ -37,12 +38,17 @@ public class AimingCommand implements CommandExecutor {
             return false;
         }
 
+        if (!(craft instanceof PlayerCraft)) {
+            player.sendMessage(I18nSupport.getInternationalisedString("Not on ship"));
+            return false;
+        }
+
         Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
         if (resident == null) {
             return false;
         }
 
-        if (!MovecraftUtils.isFriendly(resident, craft)) {
+        if (!MovecraftUtils.isFriendly(resident, (PlayerCraft) craft)) {
             player.sendMessage(I18nSupport.getInternationalisedString("Unfriendly craft"));
             return false;
         }
