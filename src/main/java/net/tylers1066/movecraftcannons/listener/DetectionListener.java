@@ -22,7 +22,7 @@ import java.util.UUID;
 
 public class DetectionListener implements Listener {
 
-    public static HashMap<Craft, Set<Cannon>> cannonsOnCraft = new HashMap<>();
+    public static HashMap<Craft, HashSet<Cannon>> cannonsOnCraft = new HashMap<>();
 
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -37,7 +37,7 @@ public class DetectionListener implements Listener {
         }
 
         UUID pilotUUID = ((PlayerCraft) craft).getPlayer().getUniqueId();
-        Set<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), pilotUUID);
+        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), pilotUUID);
         if (cannons.isEmpty()) {
             return;
         }

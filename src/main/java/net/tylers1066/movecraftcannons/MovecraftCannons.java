@@ -14,12 +14,8 @@ import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.aiming.AimingCommand;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
 import net.tylers1066.movecraftcannons.config.Config;
-import net.tylers1066.movecraftcannons.listener.DetectionListener;
-import net.tylers1066.movecraftcannons.listener.ProjectileImpactListener;
-import net.tylers1066.movecraftcannons.listener.RotationListener;
-import net.tylers1066.movecraftcannons.listener.TranslationListener;
+import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
@@ -116,6 +112,7 @@ public final class MovecraftCannons extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DetectionListener(), this);
         getServer().getPluginManager().registerEvents(new TranslationListener(), this);
         getServer().getPluginManager().registerEvents(new RotationListener(), this);
+        getServer().getPluginManager().registerEvents(new CannonListener(), this);
         this.getCommand("aim").setExecutor(new AimingCommand());
     }
 
