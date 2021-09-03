@@ -1,6 +1,8 @@
 package net.tylers1066.movecraftcannons.listener;
 
+import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.event.CannonAfterCreateEvent;
+import at.pavlov.cannons.event.CannonDestroyedEvent;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
@@ -26,6 +28,13 @@ public class CannonListener implements Listener {
         }
         if (craft != null) {
             DetectionListener.cannonsOnCraft.computeIfAbsent(craft, k -> new HashSet<>()).add(event.getCannon());
+        }
+    }
+
+    @EventHandler
+    public void onCannonDestroy(CannonDestroyedEvent event) {
+        for (HashSet<Cannon> cannons: DetectionListener.cannonsOnCraft.values()) {
+            cannons.remove(event.getCannon());
         }
     }
 }
