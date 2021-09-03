@@ -4,6 +4,7 @@ import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.event.CannonAfterCreateEvent;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
 import net.countercraft.movecraft.MovecraftLocation;
+import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.util.MathUtils;
@@ -19,10 +20,10 @@ public class CannonListener implements Listener {
     public void onCannonCreate(CannonAfterCreateEvent event) {
         World world = event.getCannon().getWorldBukkit();
         MovecraftLocation cannonLoc = MathUtils.bukkit2MovecraftLoc(event.getCannon().getLocation());
-        PlayerCraft craft = null;
-        for (PlayerCraft pcraft: CraftManager.getInstance().getPlayerCraftsInWorld(world)) {
-            if (MathUtils.locIsNearCraftFast(pcraft, cannonLoc)) {
-                craft = pcraft;
+        Craft craft = null;
+        for (Craft testCraft: CraftManager.getInstance().getCraftsInWorld(world)) {
+            if (MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
+                craft = testCraft;
                 break;
             }
         }

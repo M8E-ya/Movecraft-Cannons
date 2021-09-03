@@ -29,15 +29,16 @@ public class DetectionListener implements Listener {
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
         String craftName = craft.getType().getCraftName();
-        if (!(craft instanceof PlayerCraft)) {
-            return;
-        }
         if (!Config.CraftAllowedCannons.containsKey(craftName)) {
             return;
         }
 
-        UUID pilotUUID = ((PlayerCraft) craft).getPlayer().getUniqueId();
-        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), pilotUUID);
+        Player player = craft.getNotificationPlayer();
+        UUID uuid = null;
+        if (player != null) {
+            uuid = player.getUniqueId();
+        }
+        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), uuid);
         if (cannons.isEmpty()) {
             return;
         }

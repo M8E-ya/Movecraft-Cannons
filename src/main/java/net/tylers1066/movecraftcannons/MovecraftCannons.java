@@ -2,6 +2,7 @@ package net.tylers1066.movecraftcannons;
 
 import at.pavlov.cannons.API.CannonsAPI;
 import at.pavlov.cannons.Cannons;
+import at.pavlov.cannons.Enum.BreakCause;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.cannon.CannonDesign;
 import at.pavlov.cannons.cannon.CannonManager;
@@ -138,8 +139,8 @@ public final class MovecraftCannons extends JavaPlugin {
             Cannon cannon = iter.next();
             Location firingTriggerLocation = cannon.getCannonDesign().getFiringTrigger(cannon).getBlock().getLocation();
             if (cannonLocations.contains(firingTriggerLocation)) {
-                cannon.setValid(false);
                 iter.remove();
+                cannon.destroyCannon(false, false, BreakCause.Other);
                 continue;
             }
             cannonLocations.add(firingTriggerLocation);
