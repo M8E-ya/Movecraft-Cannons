@@ -1,9 +1,10 @@
 package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.event.ProjectileImpactEvent;
-import net.countercraft.movecraft.combat.movecraftcombat.tracking.DamageManager;
+import net.countercraft.movecraft.combat.tracking.DamageManager;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
@@ -25,6 +26,11 @@ public class ProjectileImpactListener implements Listener {
         if(craft == null)
             return;
 
+        if (!(craft instanceof PlayerCraft)) {
+            return;
+        }
+        PlayerCraft pcraft = (PlayerCraft) craft;
+
         if(!MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(e.getImpactLocation())))
             return;
 
@@ -33,6 +39,6 @@ public class ProjectileImpactListener implements Listener {
         if(cause == null || !cause.isOnline())
             return;
 
-        DamageManager.getInstance().addDamageRecord(craft, cause, new ProjectileImpactDamage());
+        DamageManager.getInstance().addDamageRecord(pcraft, cause, new ProjectileImpactDamage());
     }
 }
