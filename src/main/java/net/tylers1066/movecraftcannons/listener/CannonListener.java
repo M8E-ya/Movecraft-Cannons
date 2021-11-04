@@ -11,6 +11,7 @@ import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -53,7 +54,7 @@ public class CannonListener implements Listener {
         World world = cannon.getWorldBukkit();
         MovecraftLocation cannonLoc = MathUtils.bukkit2MovecraftLoc(cannon.getLocation());
         for (Craft testCraft: CraftManager.getInstance().getCraftsInWorld(world)) {
-            if (MathUtils.locIsNearCraftFast(testCraft, cannonLoc) && testCraft.getType().getCraftName().equals("Shipyard")) {
+            if (Config.CraftAllowedCannons.get(testCraft.getType().getCraftName()).contains(cannon.getCannonDesign().getDesignName()) && MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
                 Player player = Bukkit.getPlayer(event.getPlayer());
                 if (player != null) {
                     player.sendMessage(Component.text("This cannon is not allowed on this craft.", NamedTextColor.RED));
