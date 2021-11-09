@@ -2,6 +2,7 @@ package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.event.CannonAfterCreateEvent;
+import at.pavlov.cannons.event.CannonBeforeCreateEvent;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
 import at.pavlov.cannons.event.CannonFireEvent;
 import net.countercraft.movecraft.MovecraftLocation;
@@ -12,6 +13,7 @@ import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.tylers1066.movecraftcannons.config.Config;
+import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -23,18 +25,24 @@ import org.bukkit.event.Listener;
 import java.util.HashSet;
 
 public class CannonListener implements Listener {
+    @EventHandler
+    public void beforeCannonCreate(CannonBeforeCreateEvent event) {
+        World world = event.getCannon().getWorldBukkit();
+        MovecraftLocation cannonLoc = MathUtils.bukkit2MovecraftLoc(event.getCannon().getLocation());
+        Craft craft = getCraft(world, cannonLoc);
+        if (craft == null) {
+            return;
+        }
+        if (!Config.CraftAllowedCannons.get(craft.getType().getCraftName()).contains(event.getCannon().getCannonDesign().getDesignName())) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void onCannonCreate(CannonAfterCreateEvent event) {
         World world = event.getCannon().getWorldBukkit();
         MovecraftLocation cannonLoc = MathUtils.bukkit2MovecraftLoc(event.getCannon().getLocation());
-        Craft craft = null;
-        for (Craft testCraft: CraftManager.getInstance().getCraftsInWorld(world)) {
-            if (MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
-                craft = testCraft;
-                break;
-            }
-        }
+        Craft craft = getCraft(world, cannonLoc);
         if (craft != null) {
             DetectionListener.cannonsOnCraft.computeIfAbsent(craft, k -> new HashSet<>()).add(event.getCannon());
         }
@@ -62,5 +70,14 @@ public class CannonListener implements Listener {
                 break;
             }
         }
+    }
+
+    private Craft getCraft(World world, MovecraftLocation cannonLoc) {
+        for (Craft testCraft: CraftManager.getInstance().getCraftsInWorld(world)) {
+            if (MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
+                return testCraft;
+            }
+        }
+        return null;
     }
 }
