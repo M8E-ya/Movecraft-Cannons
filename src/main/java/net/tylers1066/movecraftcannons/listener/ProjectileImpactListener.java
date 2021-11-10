@@ -36,8 +36,12 @@ public class ProjectileImpactListener implements Listener {
 
         UUID shooter = e.getShooterUID();
         Player cause = MovecraftCannons.getInstance().getServer().getPlayer(shooter);
-        if(cause == null || !cause.isOnline() || cause.getUniqueId().equals(shooter))
+        if(cause == null || !cause.isOnline())
             return;
+
+        if (cause.getUniqueId().equals(shooter)) {
+            e.setCancelled(true);
+        }
 
         DamageManager.getInstance().addDamageRecord(pcraft, cause, new ProjectileImpactDamage());
     }
