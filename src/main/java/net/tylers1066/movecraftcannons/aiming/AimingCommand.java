@@ -23,8 +23,6 @@ import java.util.Set;
 
 public class AimingCommand implements CommandExecutor {
 
-    public Aiming aiming = Cannons.getPlugin().getAiming();
-
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
@@ -53,76 +51,8 @@ public class AimingCommand implements CommandExecutor {
             return false;
         }
 
-        Set<Cannon> cannonList = DetectionListener.cannonsOnCraft.get(craft);
-        //cannonList.removeIf(cannon -> cannon.getCannonDirection() != player.getFacing());
-        if (cannonList == null || cannonList.isEmpty()) {
-            player.sendMessage(I18nSupport.getInternationalisedString("No cannons to aim"));
-            return false;
-        }
-
-        int i = 0;
-        Location eyeLocation = player.getEyeLocation();
-        GunAngles angles;
-
-        for (Cannon cannon : cannonList) {
-            if (!cannon.canAimPitch(eyeLocation.getPitch()) || !cannon.canAimYaw(eyeLocation.getYaw())) {
-                continue;
-            }
-            angles = getGunAngle(cannon, eyeLocation.getYaw(), eyeLocation.getPitch());
-            cannon.setVerticalAngle(angles.getVertical());
-            cannon.setHorizontalAngle(angles.getHorizontal());
-
-            aiming.showAimingVector(cannon, player);
-            CannonsUtil.playSound(cannon.getMuzzle(), cannon.getCannonDesign().getSoundAdjust());
-            i++;
-        }
-        player.sendMessage(String.format(I18nSupport.getInternationalisedString("Changed aim"), i));
+        AimingUtils.aimCannonsOnCraft(craft, player);
         return true;
     }
 
-    private static class GunAngles
-    {
-        private double horizontal;
-        private double vertical;
-
-        public GunAngles(double horizontal, double vertical)
-        {
-            this.setHorizontal(horizontal);
-            this.setVertical(vertical);
-        }
-
-        public double getHorizontal() {
-            return horizontal;
-        }
-
-        public void setHorizontal(double horizontal) {
-            this.horizontal = horizontal;
-        }
-
-        public double getVertical() {
-            return vertical;
-        }
-
-        public void setVertical(double vertical) {
-            this.vertical = vertical;
-        }
-    }
-
-
-    /**
-     * evaluates the difference between actual cannon direction and the given direction
-     * @param cannon operated cannon
-     * @param yaw yaw of the direction to aim
-     * @param pitch pitch of the direction to aim
-     * @return new cannon aiming direction
-     */
-    private GunAngles getGunAngle(Cannon cannon, double yaw, double pitch)
-    {
-        double horizontal = yaw - CannonsUtil.directionToYaw(cannon.getCannonDirection());
-        horizontal = horizontal % 360;
-        while (horizontal < -180)
-            horizontal = horizontal + 360;
-
-        return new GunAngles(horizontal, -pitch);
-    }
 }
