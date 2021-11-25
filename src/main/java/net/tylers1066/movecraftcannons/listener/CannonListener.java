@@ -63,7 +63,7 @@ public class CannonListener implements Listener {
         for (Craft testCraft: CraftManager.getInstance().getCraftsInWorld(world)) {
             if (!Config.CraftAllowedCannons.get(testCraft.getType().getCraftName()).contains(cannon.getCannonDesign().getDesignName()) && MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
                 Player player = Bukkit.getPlayer(event.getPlayer());
-                if (player != null) {
+                if (player != null && cannon.getLocation().distanceSquared(player.getLocation()) < 10000) { // 100 blocks
                     player.sendMessage(Component.text("This cannon is not allowed on this craft.", NamedTextColor.RED));
                 }
                 event.setCancelled(true);
