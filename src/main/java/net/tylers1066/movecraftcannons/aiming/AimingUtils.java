@@ -4,11 +4,15 @@ import at.pavlov.cannons.Aiming;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.utils.CannonsUtil;
+import net.countercraft.movecraft.combat.config.Config;
 import net.countercraft.movecraft.craft.Craft;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import java.util.Set;
 
@@ -25,14 +29,22 @@ public class AimingUtils {
         }
 
         int i = 0;
-        Location eyeLocation = player.getEyeLocation();
+        // TODO: use per-player no-tick view distance once it has been re-implemented
+        Vector targetVector = player.getTargetBlock(Config.Transparent, Config.AADirectorRange).getLocation().toVector();
         GunAngles angles;
 
         for (Cannon cannon : cannonList) {
-            if (!cannon.canAimPitch(eyeLocation.getPitch()) || !cannon.canAimYaw(eyeLocation.getYaw())) {
+            Vector muzzleVector = cannon.getMuzzle().toVector();
+            Vector direction = targetVector.clone().subtract(muzzleVector);
+
+            double yaw = CannonsUtil.vectorToYaw(direction);
+            double pitch = CannonsUtil.vectorToPitch(direction);
+
+            if (!cannon.canAimPitch(pitch) || !cannon.canAimYaw(yaw)) {
                 continue;
             }
-            angles = getGunAngle(cannon, eyeLocation.getYaw(), eyeLocation.getPitch());
+
+            angles = getGunAngle(cannon, yaw, pitch);
             cannon.setVerticalAngle(angles.getVertical());
             cannon.setHorizontalAngle(angles.getHorizontal());
 
@@ -42,7 +54,6 @@ public class AimingUtils {
         }
         player.sendMessage(String.format(I18nSupport.getInternationalisedString("Changed aim"), i));
     }
-
 
     private static class GunAngles
     {
