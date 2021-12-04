@@ -30,7 +30,7 @@ public class AimingUtils {
 
         int i = 0;
         // TODO: use per-player no-tick view distance once it has been re-implemented
-        Vector targetVector = player.getTargetBlock(Config.Transparent, Config.AADirectorRange).getLocation().toVector();
+        Vector targetVector = player.getTargetBlock(Config.Transparent, player.getWorld().getViewDistance() * 16).getLocation().toVector();
         GunAngles angles;
 
         for (Cannon cannon : cannonList) {
