@@ -3,6 +3,7 @@ package net.tylers1066.movecraftcannons.listener;
 import at.pavlov.cannons.cannon.Cannon;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.PlayerCraft;
+import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
@@ -28,7 +29,7 @@ public class DetectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
-        String craftName = craft.getType().getCraftName();
+        String craftName = craft.getType().getStringProperty(CraftType.NAME);
         if (!Config.CraftAllowedCannons.containsKey(craftName) || Config.CraftAllowedCannons.get(craftName).isEmpty()) {
             return;
         }

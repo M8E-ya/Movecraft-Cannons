@@ -31,17 +31,13 @@ public class ProjectileImpactListener implements Listener {
         }
         PlayerCraft pcraft = (PlayerCraft) craft;
 
-        if(!MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(e.getImpactLocation())))
+        if(!MathUtils.locationNearHitBox(craft.getHitBox(), e.getImpactLocation(), 1))
             return;
 
         UUID shooter = e.getShooterUID();
         Player cause = MovecraftCannons.getInstance().getServer().getPlayer(shooter);
         if(cause == null || !cause.isOnline())
             return;
-
-        if (cause.getUniqueId().equals(shooter)) {
-            e.setCancelled(true);
-        }
 
         DamageManager.getInstance().addDamageRecord(pcraft, cause, new ProjectileImpactDamage());
     }

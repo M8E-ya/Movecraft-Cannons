@@ -9,6 +9,7 @@ import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
+import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -33,7 +34,7 @@ public class CannonListener implements Listener {
         if (craft == null) {
             return;
         }
-        if (!Config.CraftAllowedCannons.get(craft.getType().getCraftName()).contains(event.getCannon().getCannonDesign().getDesignName())) {
+        if (!Config.CraftAllowedCannons.get(craft.getType().getStringProperty(CraftType.NAME)).contains(event.getCannon().getCannonDesign().getDesignName())) {
             event.setCancelled(true);
         }
     }
@@ -61,7 +62,7 @@ public class CannonListener implements Listener {
         World world = cannon.getWorldBukkit();
         MovecraftLocation cannonLoc = MathUtils.bukkit2MovecraftLoc(cannon.getLocation());
         for (Craft testCraft: CraftManager.getInstance().getCraftsInWorld(world)) {
-            if (!Config.CraftAllowedCannons.get(testCraft.getType().getCraftName()).contains(cannon.getCannonDesign().getDesignName()) && MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
+            if (!Config.CraftAllowedCannons.get(testCraft.getType().getStringProperty(CraftType.NAME)).contains(cannon.getCannonDesign().getDesignName()) && MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
                 Player player = Bukkit.getPlayer(event.getPlayer());
                 if (player != null && cannon.getLocation().distanceSquared(player.getLocation()) < 10000) { // 100 blocks
                     player.sendMessage(Component.text("This cannon is not allowed on this craft.", NamedTextColor.RED));

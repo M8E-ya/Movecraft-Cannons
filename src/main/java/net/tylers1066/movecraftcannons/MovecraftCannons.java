@@ -10,7 +10,7 @@ import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.MovecraftCombat;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.craft.CraftType;
+import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.aiming.AimingCommand;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
@@ -83,7 +83,7 @@ public final class MovecraftCannons extends JavaPlugin {
 
         // Load firepower limits for each craft:
         for (CraftType craftType : craftTypes) {
-            String craftName = craftType.getCraftName();
+            String craftName = craftType.getStringProperty(CraftType.NAME);
             if (!getConfig().isConfigurationSection("FirepowerLimits")) {
                 getLogger().log(Level.SEVERE, "Config is missing FirepowerLimits section!");
             }
@@ -93,7 +93,7 @@ public final class MovecraftCannons extends JavaPlugin {
 
         // Load allowed cannons for each craft:
         for (CraftType craftType : craftTypes) {
-            String craftName = craftType.getCraftName();
+            String craftName = craftType.getStringProperty(CraftType.NAME);
             if (!getConfig().isConfigurationSection("AllowedCannons")) {
                 getLogger().log(Level.SEVERE, "Config is missing AllowedCannons section!");
             }
