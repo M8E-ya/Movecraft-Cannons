@@ -6,7 +6,7 @@
 
     <groupId>net.TylerS1066.Movecraft-Cannons</groupId>
     <artifactId>Movecraft-Cannons</artifactId>
-    <version>1.a.0</version>
+    <version>1.a.6</version>
     <packaging>jar</packaging>
 
     <name>Movecraft-Cannons</name>
@@ -29,6 +29,17 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>github</id>
+            <name>GitHub APDevTeam/Movecraft Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/APDevTeam/Movecraft</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
@@ -58,7 +69,7 @@
         <dependency>
             <groupId>net.countercraft</groupId>
             <artifactId>movecraft</artifactId>
-            <version>8.0.0-a.4.5</version>
+            <version>LATEST</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -71,7 +82,7 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations-java5</artifactId>
-            <version>RELEASE</version>
+            <version>22.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.github.LlmDl</groupId>
@@ -88,8 +99,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>13</source>
+                    <target>13</target>
                 </configuration>
             </plugin>
         </plugins>

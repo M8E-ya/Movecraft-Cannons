@@ -23,15 +23,10 @@ public class ProjectileImpactListener implements Listener {
 
 
         Craft craft = CraftManager.getInstance().fastNearestCraftToLoc(e.getImpactLocation());
-        if(craft == null)
+        if(craft == null || !(craft instanceof PlayerCraft))
             return;
 
-        if (!(craft instanceof PlayerCraft)) {
-            return;
-        }
-        PlayerCraft pcraft = (PlayerCraft) craft;
-
-        if(!MathUtils.locationNearHitBox(craft.getHitBox(), e.getImpactLocation(), 1))
+        if(!MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(e.getImpactLocation())))
             return;
 
         UUID shooter = e.getShooterUID();
@@ -39,6 +34,7 @@ public class ProjectileImpactListener implements Listener {
         if(cause == null || !cause.isOnline())
             return;
 
-        DamageManager.getInstance().addDamageRecord(pcraft, cause, new ProjectileImpactDamage());
+        PlayerCraft playerCraft = (PlayerCraft) craft;
+        DamageManager.getInstance().addDamageRecord(playerCraft, cause, new ProjectileImpactDamage());
     }
 }
