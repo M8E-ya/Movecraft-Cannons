@@ -8,13 +8,15 @@ import at.pavlov.cannons.cannon.CannonDesign;
 import at.pavlov.cannons.cannon.CannonManager;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.MovecraftCombat;
+import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.type.CraftType;
+import net.countercraft.movecraft.util.MathUtils;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
+import net.tylers1066.movecraftcannons.aiming.AimingCommand;
 import net.tylers1066.movecraftcannons.aiming.AimingListener;
 import net.tylers1066.movecraftcannons.config.Config;
-import net.tylers1066.movecraftcannons.listener.CraftDetectListener;
-import net.tylers1066.movecraftcannons.listener.ProjectileImpactListener;
-import net.tylers1066.movecraftcannons.listener.RotationListener;
-import net.tylers1066.movecraftcannons.listener.TranslationListener;
+import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.type.MaxCannonsProperty;
 import org.bukkit.Location;
@@ -82,47 +84,48 @@ public final class MovecraftCannons extends JavaPlugin {
                 getServer().getPluginManager().registerEvents(new ProjectileImpactListener(), this);
             } else {
                 getLogger().info(I18nSupport.getInternationalisedString("Movecraft-Combat not found"));
-        }
-
-        Set<CraftType> craftTypes = CraftManager.getInstance().getCraftTypes();
-
-        // Load firepower limits for each craft:
-        for (CraftType craftType : craftTypes) {
-            String craftName = craftType.getStringProperty(CraftType.NAME);
-            if (!getConfig().isConfigurationSection("FirepowerLimits")) {
-                getLogger().log(Level.SEVERE, "Config is missing FirepowerLimits section!");
             }
-            getLogger().log(Level.INFO, "Loaded firepower limits for " + craftName);
-            Config.CraftFirepowerLimits.put(craftName, getConfig().getInt("FirepowerLimits." + craftName, 0));
-        }
 
-        // Load allowed cannons for each craft:
-        for (CraftType craftType : craftTypes) {
-            String craftName = craftType.getStringProperty(CraftType.NAME);
-            if (!getConfig().isConfigurationSection("AllowedCannons")) {
-                getLogger().log(Level.SEVERE, "Config is missing AllowedCannons section!");
+            Set<CraftType> craftTypes = CraftManager.getInstance().getCraftTypes();
+
+            // Load firepower limits for each craft:
+            for (CraftType craftType : craftTypes) {
+                String craftName = craftType.getStringProperty(CraftType.NAME);
+                if (!getConfig().isConfigurationSection("FirepowerLimits")) {
+                    getLogger().log(Level.SEVERE, "Config is missing FirepowerLimits section!");
+                }
+                getLogger().log(Level.INFO, "Loaded firepower limits for " + craftName);
+                Config.CraftFirepowerLimits.put(craftName, getConfig().getInt("FirepowerLimits." + craftName, 0));
             }
-            getLogger().log(Level.INFO, "Loaded allowed cannons for " + craftName);
-            Config.CraftAllowedCannons.put(craftName, getConfig().getStringList("AllowedCannons." + craftName));
-        }
 
-        // Assign firepower values to each cannon type:
-        for (CannonDesign cannonDesign : cannonsPlugin.getDesignStorage().getCannonDesignList()) {
-            String cannonName = cannonDesign.getDesignName();
-            if (!getConfig().isConfigurationSection("CannonFirepower")) {
-                getLogger().log(Level.SEVERE, "Config is missing CannonFirepower section!");
+            // Load allowed cannons for each craft:
+            for (CraftType craftType : craftTypes) {
+                String craftName = craftType.getStringProperty(CraftType.NAME);
+                if (!getConfig().isConfigurationSection("AllowedCannons")) {
+                    getLogger().log(Level.SEVERE, "Config is missing AllowedCannons section!");
+                }
+                getLogger().log(Level.INFO, "Loaded allowed cannons for " + craftName);
+                Config.CraftAllowedCannons.put(craftName, getConfig().getStringList("AllowedCannons." + craftName));
             }
-            getLogger().log(Level.INFO, "Loaded firepower value for " + cannonName);
-            Config.CannonFirepowerValues.put(cannonName, getConfig().getInt("CannonFirepower." + cannonName, 0));
+
+            // Assign firepower values to each cannon type:
+            for (CannonDesign cannonDesign : cannonsPlugin.getDesignStorage().getCannonDesignList()) {
+                String cannonName = cannonDesign.getDesignName();
+                if (!getConfig().isConfigurationSection("CannonFirepower")) {
+                    getLogger().log(Level.SEVERE, "Config is missing CannonFirepower section!");
+                }
+                getLogger().log(Level.INFO, "Loaded firepower value for " + cannonName);
+                Config.CannonFirepowerValues.put(cannonName, getConfig().getInt("CannonFirepower." + cannonName, 0));
+            }
+
+            getServer().getPluginManager().registerEvents(new DetectionListener(), this);
+            getServer().getPluginManager().registerEvents(new TranslationListener(), this);
+            getServer().getPluginManager().registerEvents(new RotationListener(), this);
+            getServer().getPluginManager().registerEvents(new CannonListener(), this);
+            getServer().getPluginManager().registerEvents(new AimingListener(), this);
+
+            this.getCommand("aim").setExecutor(new AimingCommand());
         }
-
-        getServer().getPluginManager().registerEvents(new DetectionListener(), this);
-        getServer().getPluginManager().registerEvents(new TranslationListener(), this);
-        getServer().getPluginManager().registerEvents(new RotationListener(), this);
-        getServer().getPluginManager().registerEvents(new CannonListener(), this);
-        getServer().getPluginManager().registerEvents(new AimingListener(), this);
-
-        this.getCommand("aim").setExecutor(new AimingCommand());
     }
 
     @Override
