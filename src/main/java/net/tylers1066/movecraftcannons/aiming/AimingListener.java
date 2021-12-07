@@ -3,14 +3,17 @@ package net.tylers1066.movecraftcannons.aiming;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.Enum.InteractAction;
 import at.pavlov.cannons.cannon.Cannon;
+import com.palmergames.bukkit.towny.TownyAPI;
+import com.palmergames.bukkit.towny.utils.CombatUtil;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
-import org.bukkit.Bukkit;
+import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -67,6 +70,12 @@ public class AimingListener implements Listener {
         }
 
         if (!PlainTextComponentSerializer.plainText().serialize(sign.lines().get(0)).equalsIgnoreCase("Aiming Director")) {
+            return;
+        }
+
+        Craft craft = MovecraftUtils.getCurrentShip(player);
+        if (!(craft instanceof PlayerCraft pcraft) || !(MovecraftUtils.isFriendly(TownyAPI.getInstance().getResident(player), pcraft))) {
+            player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Unfriendly craft"), TextColor.color(0xffb2ab)));
             return;
         }
 

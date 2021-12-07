@@ -1,6 +1,7 @@
 package net.tylers1066.movecraftcannons.aiming;
 
 import at.pavlov.cannons.Cannons;
+import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Resident;
 import net.countercraft.movecraft.craft.Craft;
@@ -24,30 +25,14 @@ public class AimingCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             return false;
         }
 
-        Player player = (Player) sender;
         Craft craft = MovecraftUtils.getCurrentShip(player);
-        if (craft == null) {
-            player.sendMessage(I18nSupport.getInternationalisedString("Not on ship"));
-            return false;
-        }
-
-        if (!(craft instanceof PlayerCraft)) {
-            player.sendMessage(I18nSupport.getInternationalisedString("Not on ship"));
-            return false;
-        }
-
-        Resident resident = TownyUniverse.getInstance().getResident(player.getUniqueId());
-        if (resident == null) {
-            return false;
-        }
-
-        if (!MovecraftUtils.isFriendly(resident, (PlayerCraft) craft)) {
-            player.sendMessage(I18nSupport.getInternationalisedString("Unfriendly craft"));
-            return false;
+        if (!(craft instanceof PlayerCraft pcraft) || !(MovecraftUtils.isFriendly(TownyAPI.getInstance().getResident(player), pcraft))) {
+            player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Unfriendly craft"), TextColor.color(0xffb2ab)));
+            return true;
         }
 
         String cannonType = null;
@@ -62,7 +47,7 @@ public class AimingCommand implements TabExecutor {
                 player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Deselected cannon type"), TextColor.color(0xc3f09e)));
             }
             else {
-                player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Invalid cannon type"), cannonType), TextColor.color(0xc3f09e)));
+                player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Invalid cannon type"), cannonType), TextColor.color(0xffb2ab)));
                 return true;
             }
         }
