@@ -7,9 +7,15 @@ import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,6 +47,37 @@ public class AimingListener implements Listener {
 
         else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             AimingUtils.aimCannonsOnCraft(craft, player, null);
+        }
+    }
+
+    @EventHandler
+    public void onRightClick(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
+        Player player = event.getPlayer();
+        Block block = event.getClickedBlock();
+        if (!Tag.SIGNS.isTagged(block.getType())) {
+            return;
+        }
+        BlockState state = block.getState(false);
+        if (!(state instanceof Sign sign)) {
+            return;
+        }
+
+        if (!PlainTextComponentSerializer.plainText().serialize(sign.lines().get(0)).equalsIgnoreCase("Aiming Director")) {
+            return;
+        }
+
+        String cannonType = PlainTextComponentSerializer.plainText().serialize(sign.lines().get(1));
+        if (Cannons.getPlugin().getDesignStorage().getDesignIds().contains(cannonType)) {
+            AimingUtils.getPlayerCannonSelections().put(player.getUniqueId(), cannonType);
+            player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Selected cannon type"), cannonType), TextColor.color(0xc3f09e)));
+        }
+        else if (cannonType.equalsIgnoreCase("all")) {
+            AimingUtils.getPlayerCannonSelections().remove(player.getUniqueId());
+            player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Deselected cannon type"), TextColor.color(0xc3f09e)));
         }
     }
 
