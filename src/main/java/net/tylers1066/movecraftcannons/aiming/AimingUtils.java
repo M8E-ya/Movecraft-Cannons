@@ -8,24 +8,28 @@ import net.countercraft.movecraft.combat.config.Config;
 import net.countercraft.movecraft.craft.Craft;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.Set;
+import java.util.UUID;
 
 public class AimingUtils {
 
     private static final Aiming aiming = Cannons.getPlugin().getAiming();
+    private static final HashMap<UUID, String> cannonPlayerSelections = new HashMap<>();
 
-    public static void aimCannonsOnCraft(Craft craft, Player player) {
+    public static void aimCannonsOnCraft(Craft craft, Player player, @Nullable String cannonType) {
         Set<Cannon> cannonList = DetectionListener.cannonsOnCraft.get(craft);
-        //cannonList.removeIf(cannon -> cannon.getCannonDirection() != player.getFacing());
         if (cannonList == null || cannonList.isEmpty()) {
             player.sendMessage(I18nSupport.getInternationalisedString("No cannons to aim"));
             return;
+        }
+
+        if (cannonType == null && cannonPlayerSelections.containsKey(player.getUniqueId())) {
+            cannonType = cannonPlayerSelections.get(player.getUniqueId());
         }
 
         int i = 0;
@@ -34,6 +38,10 @@ public class AimingUtils {
         GunAngles angles;
 
         for (Cannon cannon : cannonList) {
+            if (cannonType != null && !cannon.getCannonDesign().getDesignName().equals(cannonType)) {
+                continue;
+            }
+
             Vector muzzleVector = cannon.getMuzzle().toVector();
             Vector direction = targetVector.clone().subtract(muzzleVector);
 
@@ -53,6 +61,10 @@ public class AimingUtils {
             i++;
         }
         player.sendMessage(String.format(I18nSupport.getInternationalisedString("Changed aim"), i));
+    }
+
+    public static HashMap<UUID, String> getPlayerCannonSelections() {
+        return cannonPlayerSelections;
     }
 
     private static class GunAngles

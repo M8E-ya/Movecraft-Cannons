@@ -1,27 +1,26 @@
 package net.tylers1066.movecraftcannons.aiming;
 
-import at.pavlov.cannons.Aiming;
 import at.pavlov.cannons.Cannons;
-import at.pavlov.cannons.cannon.Cannon;
-import at.pavlov.cannons.utils.CannonsUtil;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Resident;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.PlayerCraft;
-import net.tylers1066.movecraftcannons.MovecraftCannons;
-import net.tylers1066.movecraftcannons.listener.DetectionListener;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
-import org.bukkit.Location;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class AimingCommand implements CommandExecutor {
+public class AimingCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -51,8 +50,35 @@ public class AimingCommand implements CommandExecutor {
             return false;
         }
 
-        AimingUtils.aimCannonsOnCraft(craft, player);
+        String cannonType = null;
+        if (args.length == 1) {
+            cannonType = args[0];
+            if (Cannons.getPlugin().getDesignStorage().getDesignIds().contains(args[0])) {
+                player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Selected cannon type"), cannonType), TextColor.color(0xc3f09e)));
+                AimingUtils.getPlayerCannonSelections().put(player.getUniqueId(), cannonType);
+            }
+            else if (cannonType.equalsIgnoreCase("all")) {
+                AimingUtils.getPlayerCannonSelections().remove(player.getUniqueId());
+                player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Deselected cannon type"), TextColor.color(0xc3f09e)));
+            }
+            else {
+                player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Invalid cannon type"), cannonType), TextColor.color(0xc3f09e)));
+                return true;
+            }
+        }
+
+        AimingUtils.aimCannonsOnCraft(craft, player, cannonType);
         return true;
     }
 
+    @Override
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        if (args.length == 1) {
+            ArrayList<String> tabCompletions = new ArrayList<>();
+            tabCompletions.add("all");
+            tabCompletions.addAll(Cannons.getPlugin().getDesignStorage().getDesignIds());
+            return tabCompletions;
+        }
+        return Collections.emptyList();
+    }
 }

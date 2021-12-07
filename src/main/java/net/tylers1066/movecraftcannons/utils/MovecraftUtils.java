@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 public class MovecraftUtils {
 
     public static boolean isFriendly(Resident resident, PlayerCraft craft) {
-        Resident pilotResident = TownyAPI.getInstance().getResident(craft.getPlayer().getUniqueId());
+        Resident pilotResident = TownyAPI.getInstance().getResident(craft.getPilot().getUniqueId());
         if (pilotResident == null) {
             return false;
         }
