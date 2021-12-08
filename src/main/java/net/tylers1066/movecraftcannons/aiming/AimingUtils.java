@@ -63,7 +63,8 @@ public class AimingUtils {
             CannonsUtil.playSound(cannon.getMuzzle(), cannon.getCannonDesign().getSoundAdjust());
             i++;
         }
-        player.sendActionBar(Component.text(String.format(I18nSupport.getInternationalisedString("Changed aim"), i), TextColor.color(0xc3f09e)));
+        TextColor color = (i == 0) ? TextColor.color(0xffb2ab) : TextColor.color(0xc3f09e);
+        player.sendActionBar(Component.text(String.format(I18nSupport.getInternationalisedString("Changed aim"), i), color));
     }
 
     public static HashMap<UUID, String> getPlayerCannonSelections() {
