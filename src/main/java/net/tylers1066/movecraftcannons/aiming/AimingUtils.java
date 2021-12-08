@@ -6,6 +6,9 @@ import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.utils.CannonsUtil;
 import net.countercraft.movecraft.combat.config.Config;
 import net.countercraft.movecraft.craft.Craft;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import org.bukkit.entity.Player;
@@ -60,7 +63,7 @@ public class AimingUtils {
             CannonsUtil.playSound(cannon.getMuzzle(), cannon.getCannonDesign().getSoundAdjust());
             i++;
         }
-        player.sendMessage(String.format(I18nSupport.getInternationalisedString("Changed aim"), i));
+        player.sendActionBar(Component.text(String.format(I18nSupport.getInternationalisedString("Changed aim"), i), TextColor.color(0xc3f09e)));
     }
 
     public static HashMap<UUID, String> getPlayerCannonSelections() {
