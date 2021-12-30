@@ -42,7 +42,11 @@ public class AimingListener implements Listener {
         }
 
         if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            for (Cannon cannon: DetectionListener.cannonsOnCraft.get(craft)) {
+            var cannons = DetectionListener.cannonsOnCraft.get(craft);
+            if (cannons == null) {
+                return;
+            }
+            for (Cannon cannon: cannons) {
                 Cannons.getPlugin().getFireCannon().redstoneFiring(cannon, InteractAction.fireAutoaim);
             }
             player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Firing cannons"), TextColor.color(0xc3f09e)));
