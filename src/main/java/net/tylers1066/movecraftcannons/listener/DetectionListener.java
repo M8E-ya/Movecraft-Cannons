@@ -1,8 +1,7 @@
 package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.cannon.Cannon;
-import net.countercraft.movecraft.craft.Craft;
-import net.countercraft.movecraft.craft.PlayerCraft;
+import net.countercraft.movecraft.craft.*;
 import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftPilotEvent;
@@ -10,6 +9,7 @@ import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,7 +25,6 @@ public class DetectionListener implements Listener {
 
     public static HashMap<Craft, HashSet<Cannon>> cannonsOnCraft = new HashMap<>();
 
-
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
@@ -34,11 +33,18 @@ public class DetectionListener implements Listener {
             return;
         }
 
-        Player player = craft.getNotificationPlayer();
-        UUID uuid = null;
-        if (player != null) {
-            uuid = player.getUniqueId();
+        UUID uuid;
+        // SubcraftRotate craft cannons are controlled by their parent craft
+        if (craft instanceof SubCraftImpl) {
+            return;
         }
+        if (craft instanceof PilotedCraft pilotedCraft) {
+            uuid = pilotedCraft.getPilot().getUniqueId();
+        }
+        else {
+            return;
+        }
+
         HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), uuid);
         if (cannons.isEmpty()) {
             return;
@@ -54,7 +60,7 @@ public class DetectionListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
-            craftFirepower = craftFirepower + Config.CannonFirepowerValues.get(cannonName);
+            craftFirepower += Config.CannonFirepowerValues.get(cannonName);
         }
 
         if (craftFirepower > maximumFirepower) {
@@ -68,5 +74,9 @@ public class DetectionListener implements Listener {
     @EventHandler
     public void onRelease(CraftReleaseEvent event) {
         cannonsOnCraft.remove(event.getCraft());
+    }
+
+    public static Set<Cannon> getCannonsOnCraft(Craft craft) {
+        return cannonsOnCraft.getOrDefault(craft, new HashSet<>());
     }
 }

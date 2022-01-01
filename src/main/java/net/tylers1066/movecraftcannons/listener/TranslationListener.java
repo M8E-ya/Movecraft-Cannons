@@ -11,12 +11,13 @@ public class TranslationListener implements Listener {
     @EventHandler
     public void translateListener(CraftPostTranslateEvent event) {
         Craft craft = event.getCraft();
-        if (DetectionListener.cannonsOnCraft.get(craft) == null) {
-            return;
-        }
+        Vector vector = new Vector(event.getDx(), event.getDy(), event.getDz());
+        moveCannons(craft, vector);
+    }
 
-        for (Cannon c: DetectionListener.cannonsOnCraft.get(craft)) {
-            c.move(new Vector(event.getDx(), event.getDy(), event.getDz()));
+    private void moveCannons(Craft craft, Vector vector) {
+        for (Cannon cannon: DetectionListener.getCannonsOnCraft(craft)) {
+            cannon.move(vector);
         }
     }
 }
