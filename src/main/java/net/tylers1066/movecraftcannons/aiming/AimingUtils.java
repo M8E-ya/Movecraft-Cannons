@@ -27,7 +27,7 @@ public class AimingUtils {
     public static void aimCannonsOnCraft(Craft craft, Player player, @Nullable String cannonType) {
         Set<Cannon> cannonList = DetectionListener.cannonsOnCraft.get(craft);
         if (cannonList == null || cannonList.isEmpty()) {
-            player.sendMessage(I18nSupport.getInternationalisedString("No cannons to aim"));
+            player.sendActionBar(Component.text(I18nSupport.getInternationalisedString("No cannons to aim"), TextColor.color(0xd6524b)));
             return;
         }
 
