@@ -4,7 +4,6 @@ import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.Enum.InteractAction;
 import at.pavlov.cannons.cannon.Cannon;
 import com.palmergames.bukkit.towny.TownyAPI;
-import com.palmergames.bukkit.towny.utils.CombatUtil;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
@@ -49,7 +48,7 @@ public class AimingListener implements Listener {
             for (Cannon cannon: cannons) {
                 Cannons.getPlugin().getFireCannon().redstoneFiring(cannon, InteractAction.fireAutoaim);
             }
-            player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Firing cannons"), TextColor.color(0xc3f09e)));
+            player.sendActionBar(Component.text(I18nSupport.getInternationalisedString("Firing cannons"), TextColor.color(0xc3f09e)));
         }
 
         else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
