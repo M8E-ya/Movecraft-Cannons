@@ -5,80 +5,74 @@ import at.pavlov.cannons.event.CannonAfterCreateEvent;
 import at.pavlov.cannons.event.CannonBeforeCreateEvent;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
 import at.pavlov.cannons.event.CannonFireEvent;
-import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.craft.Craft;
-import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.craft.type.CraftType;
-import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.tylers1066.movecraftcannons.config.Config;
-import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class CannonListener implements Listener {
     @EventHandler
     public void beforeCannonCreate(CannonBeforeCreateEvent event) {
-        World world = event.getCannon().getWorldBukkit();
-        MovecraftLocation cannonLoc = MathUtils.bukkit2MovecraftLoc(event.getCannon().getLocation());
-        Craft craft = getCraft(world, cannonLoc);
+        Cannon cannon = event.getCannon();
+        Craft craft = MovecraftUtils.getParentCraftFromLocation(cannon.getLocation());
         if (craft == null) {
             return;
         }
-        if (!Config.CraftAllowedCannons.get(craft.getType().getStringProperty(CraftType.NAME)).contains(event.getCannon().getCannonDesign().getDesignName())) {
+        if (!Config.CraftAllowedCannons.get(craft.getType().getStringProperty(CraftType.NAME)).contains(cannon.getCannonDesign().getDesignName())) {
+            sendMessageToCannonOperator(cannon, event.getPlayer(), Component.text("This cannon cannot be created on this craft.", NamedTextColor.RED));
             event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onCannonCreate(CannonAfterCreateEvent event) {
-        World world = event.getCannon().getWorldBukkit();
-        MovecraftLocation cannonLoc = MathUtils.bukkit2MovecraftLoc(event.getCannon().getLocation());
-        Craft craft = getCraft(world, cannonLoc);
-        if (craft != null) {
-            DetectionListener.cannonsOnCraft.computeIfAbsent(craft, k -> new HashSet<>()).add(event.getCannon());
+        Cannon cannon = event.getCannon();
+        Craft craft = MovecraftUtils.getParentCraftFromLocation(cannon.getLocation());
+        if (craft == null) {
+            return;
         }
+        if (!Config.CraftAllowedCannons.get(craft.getType().getStringProperty(CraftType.NAME)).contains(cannon.getCannonDesign().getDesignName())) {
+            return;
+        }
+        DetectionListener.cannonsOnCraft.computeIfAbsent(craft, k -> new HashSet<>()).add(cannon);
     }
 
     @EventHandler
     public void onCannonDestroy(CannonDestroyedEvent event) {
-        for (HashSet<Cannon> cannons: DetectionListener.cannonsOnCraft.values()) {
+        for (Set<Cannon> cannons: DetectionListener.cannonsOnCraft.values()) {
             cannons.remove(event.getCannon());
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onCannonFire(CannonFireEvent event) {
         Cannon cannon = event.getCannon();
-        World world = cannon.getWorldBukkit();
-        MovecraftLocation cannonLoc = MathUtils.bukkit2MovecraftLoc(cannon.getLocation());
-        for (Craft testCraft: CraftManager.getInstance().getCraftsInWorld(world)) {
-            if (!Config.CraftAllowedCannons.get(testCraft.getType().getStringProperty(CraftType.NAME)).contains(cannon.getCannonDesign().getDesignName()) && MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
-                Player player = Bukkit.getPlayer(event.getPlayer());
-                if (player != null && cannon.getLocation().distanceSquared(player.getLocation()) < 10000) { // 100 blocks
-                    player.sendMessage(Component.text("This cannon is not allowed on this craft.", NamedTextColor.RED));
-                }
-                event.setCancelled(true);
-                break;
-            }
+        Craft craft = MovecraftUtils.getParentCraftFromLocation(cannon.getLocation());
+        if (craft == null) {
+            return;
+        }
+        if (!Config.CraftAllowedCannons.get(craft.getType().getStringProperty(CraftType.NAME)).contains(cannon.getCannonDesign().getDesignName())) {
+            sendMessageToCannonOperator(cannon, event.getPlayer(), Component.text("This cannon cannot be fired from this craft.", NamedTextColor.RED));
+            event.setCancelled(true);
         }
     }
 
-    private Craft getCraft(World world, MovecraftLocation cannonLoc) {
-        for (Craft testCraft: CraftManager.getInstance().getCraftsInWorld(world)) {
-            if (MathUtils.locIsNearCraftFast(testCraft, cannonLoc)) {
-                return testCraft;
-            }
+    private void sendMessageToCannonOperator(Cannon cannon, UUID operator, Component message) {
+        Player player = Bukkit.getPlayer(operator);
+        if (player != null && cannon.getLocation().distanceSquared(player.getLocation()) < 900) { // 30 blocks
+            player.sendMessage(message);
         }
-        return null;
     }
+
 }
