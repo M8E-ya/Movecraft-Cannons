@@ -7,6 +7,8 @@ import net.countercraft.movecraft.craft.SubCraftImpl;
 import net.countercraft.movecraft.events.CraftRotateEvent;
 import net.countercraft.movecraft.util.MathUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,13 +26,13 @@ public class RotationListener implements Listener {
         if (craft instanceof SubCraftImpl subcraft) {
             for (Cannon cannon: DetectionListener.getCannonsOnCraft(subcraft.getParent())) {
                 // We only want to move the cannons that are on the subcraft!
-                if (MathUtils.locIsNearCraftFast(subcraft, MathUtils.bukkit2MovecraftLoc(cannon.getMuzzle()))) {
+                if (isCannonFullyInCraft(cannon, subcraft)) {
                     rotateCannon(cannon, origin, rotation);
                 }
             }
         }
         else {
-            rotateCannons(craft, origin, event.getRotation());
+            rotateCannons(craft, origin, rotation);
         }
     }
 
@@ -46,5 +48,14 @@ public class RotationListener implements Listener {
         } else if (rotation == MovecraftRotation.ANTICLOCKWISE) {
             cannon.rotateLeft(origin);
         }
+    }
+
+    private boolean isCannonFullyInCraft(Cannon cannon, SubCraftImpl subCraft) {
+        for (Location location: cannon.getCannonDesign().getAllCannonBlocks(cannon)) {
+            if (!MathUtils.locIsNearCraftFast(subCraft, MathUtils.bukkit2MovecraftLoc(location))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
