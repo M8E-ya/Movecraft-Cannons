@@ -2,20 +2,19 @@ package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.event.ProjectileImpactEvent;
 import net.countercraft.movecraft.combat.tracking.DamageManager;
-import net.countercraft.movecraft.craft.Craft;
-import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.craft.PilotedCraft;
-import net.countercraft.movecraft.craft.PlayerCraft;
+import net.countercraft.movecraft.craft.*;
 import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.damagetype.ProjectileImpactDamage;
+import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.Set;
 import java.util.UUID;
 
 public class ProjectileImpactListener implements Listener {
@@ -54,7 +53,18 @@ public class ProjectileImpactListener implements Listener {
             return;
         }
 
-        if (MathUtils.locationNearHitBox(craft.getHitBox(), impactLocation, 1.5)) {
+        Set<Craft> craftsAtImpactLocation = MovecraftUtils.getPlayerCraftsAtLocation(impactLocation);
+        craftsAtImpactLocation.remove(craft);
+        if (craft instanceof SubCraftImpl subCraft) {
+            craftsAtImpactLocation.remove(subCraft.getParent());
+        }
+
+        // If there's some other craft at the location, don't cancel: the craft is in CQC
+        if (!craftsAtImpactLocation.isEmpty()) {
+            return;
+        }
+
+        if (MathUtils.locationNearHitBox(craft.getHitBox(), impactLocation, 1.0)) {
             event.setCancelled(true);
         }
     }

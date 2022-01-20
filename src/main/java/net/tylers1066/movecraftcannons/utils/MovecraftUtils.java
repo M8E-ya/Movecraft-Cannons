@@ -11,7 +11,11 @@ import net.countercraft.movecraft.craft.SubCraftImpl;
 import net.countercraft.movecraft.util.MathUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class MovecraftUtils {
 
@@ -56,5 +60,16 @@ public class MovecraftUtils {
             }
         }
         return null;
+    }
+
+    @NotNull
+    public static Set<Craft> getPlayerCraftsAtLocation(Location location) {
+        Set<Craft> crafts = new HashSet<>();
+        for (Craft craft: CraftManager.getInstance().getPlayerCraftsInWorld(location.getWorld())) {
+            if (MathUtils.locationNearHitBox(craft.getHitBox(), location, 1D)) {
+                crafts.add(craft);
+            }
+        }
+        return crafts;
     }
 }
