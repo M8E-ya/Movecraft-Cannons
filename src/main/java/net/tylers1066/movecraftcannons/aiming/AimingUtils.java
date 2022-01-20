@@ -7,12 +7,12 @@ import at.pavlov.cannons.utils.CannonsUtil;
 import net.countercraft.movecraft.combat.config.Config;
 import net.countercraft.movecraft.craft.Craft;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
@@ -36,8 +36,7 @@ public class AimingUtils {
         }
 
         int i = 0;
-        // TODO: use per-player no-tick view distance once it has been re-implemented
-        Vector targetVector = player.getTargetBlock(Config.Transparent, player.getWorld().getViewDistance() * 16).getLocation().toVector();
+        Vector targetVector = getPlayerTargetVector(player);
         GunAngles angles;
 
         for (Cannon cannon : cannonList) {
@@ -51,7 +50,7 @@ public class AimingUtils {
             double yaw = CannonsUtil.vectorToYaw(direction);
             double pitch = CannonsUtil.vectorToPitch(direction);
 
-            if (!cannon.canAimPitch(pitch) || !cannon.canAimYaw(yaw)) {
+            if (!cannonCanFireAtVector(cannon, targetVector)) {
                 continue;
             }
 
@@ -69,6 +68,22 @@ public class AimingUtils {
 
     public static HashMap<UUID, String> getPlayerCannonSelections() {
         return cannonPlayerSelections;
+    }
+
+    @NotNull
+    public static Vector getPlayerTargetVector(Player player) {
+        // TODO: use per-player no-tick view distance once it has been re-implemented
+        return player.getTargetBlock(Config.Transparent, player.getWorld().getViewDistance() * 16).getLocation().toVector();
+    }
+
+    public static boolean cannonCanFireAtVector(Cannon cannon, Vector targetVector) {
+        Vector muzzleVector = cannon.getMuzzle().toVector();
+        Vector direction = targetVector.clone().subtract(muzzleVector);
+
+        double yaw = CannonsUtil.vectorToYaw(direction);
+        double pitch = CannonsUtil.vectorToPitch(direction);
+
+        return cannon.canAimPitch(pitch) && cannon.canAimYaw(yaw);
     }
 
     private static class GunAngles

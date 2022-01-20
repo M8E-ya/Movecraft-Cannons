@@ -50,21 +50,25 @@ public class ProjectileImpactListener implements Listener {
 
         Craft craft = CraftManager.getInstance().getCraftByPlayer(cannoneer);
         if (craft == null) {
-            return;
-        }
-
-        Set<Craft> craftsAtImpactLocation = MovecraftUtils.getPlayerCraftsAtLocation(impactLocation);
-        craftsAtImpactLocation.remove(craft);
-        if (craft instanceof SubCraftImpl subCraft) {
-            craftsAtImpactLocation.remove(subCraft.getParent());
-        }
-
-        // If there's some other craft at the location, don't cancel: the craft is in CQC
-        if (!craftsAtImpactLocation.isEmpty()) {
-            return;
+            // The cannon operator may be part of the crew, but not as a pilot:
+            craft = MovecraftUtils.getCurrentShip(cannoneer);
+            if (craft == null) {
+                return;
+            }
         }
 
         if (MathUtils.locationNearHitBox(craft.getHitBox(), impactLocation, 1.0)) {
+            Set<Craft> craftsAtImpactLocation = MovecraftUtils.getPlayerCraftsAtLocation(impactLocation);
+            craftsAtImpactLocation.remove(craft);
+            if (craft instanceof SubCraftImpl subCraft) {
+                craftsAtImpactLocation.remove(subCraft.getParent());
+            }
+
+            // If there's some other craft at the location, don't cancel: the craft is in CQC
+            if (!craftsAtImpactLocation.isEmpty()) {
+                return;
+            }
+
             event.setCancelled(true);
         }
     }

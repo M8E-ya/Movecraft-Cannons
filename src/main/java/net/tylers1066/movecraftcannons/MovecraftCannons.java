@@ -103,6 +103,7 @@ public final class MovecraftCannons extends JavaPlugin {
                 String craftName = craftType.getStringProperty(CraftType.NAME);
                 if (!getConfig().isConfigurationSection("AllowedCannons")) {
                     getLogger().log(Level.SEVERE, "Config is missing AllowedCannons section!");
+                    break;
                 }
                 getLogger().log(Level.INFO, "Loaded allowed cannons for " + craftName);
                 Config.CraftAllowedCannons.put(craftName, getConfig().getStringList("AllowedCannons." + craftName));
@@ -113,6 +114,7 @@ public final class MovecraftCannons extends JavaPlugin {
                 String cannonName = cannonDesign.getDesignName();
                 if (!getConfig().isConfigurationSection("CannonFirepower")) {
                     getLogger().log(Level.SEVERE, "Config is missing CannonFirepower section!");
+                    break;
                 }
                 getLogger().log(Level.INFO, "Loaded firepower value for " + cannonName);
                 Config.CannonFirepowerValues.put(cannonName, getConfig().getInt("CannonFirepower." + cannonName, 0));
