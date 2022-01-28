@@ -60,3 +60,7 @@ AllowedCannons:
     - "TankCannon"
   Tank:
     - "TankCannon"
+
+AbsoluteMaxAllowedCannons:
+  Admin:
+    Cannon: 1

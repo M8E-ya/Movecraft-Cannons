@@ -120,6 +120,25 @@ public final class MovecraftCannons extends JavaPlugin {
                 Config.CannonFirepowerValues.put(cannonName, getConfig().getInt("CannonFirepower." + cannonName, 0));
             }
 
+            // Load absolute max allowed cannons for each craft:
+            for (CraftType craftType : craftTypes) {
+                String craftName = craftType.getStringProperty(CraftType.NAME);
+                if (!getConfig().isConfigurationSection("AbsoluteMaxAllowedCannons")) {
+                    getLogger().log(Level.SEVERE, "Config is missing AbsoluteMaxAllowedCannons section!");
+                    break;
+                }
+                var craftSection = getConfig().getConfigurationSection("AbsoluteMaxAllowedCannons").getConfigurationSection(craftName);
+                if (craftSection == null) {
+                    getLogger().info("Found no absolute max cannon limits for " + craftName);
+                    continue;
+                }
+                Map<String, Object> maxCannonsMap = craftSection.getValues(true);
+                for (Map.Entry<String, Object> maxCannonEntry: maxCannonsMap.entrySet()) {
+                    Config.addMaxCannonEntry(craftName, maxCannonEntry.getKey(), (int) maxCannonEntry.getValue());
+                }
+                getLogger().info("Loaded absolute max allowed cannons for " + craftName);
+            }
+
             getServer().getPluginManager().registerEvents(new DetectionListener(), this);
             getServer().getPluginManager().registerEvents(new TranslationListener(), this);
             getServer().getPluginManager().registerEvents(new RotationListener(), this);

@@ -52,6 +52,7 @@ public class DetectionListener implements Listener {
 
         int craftFirepower = 0;
         int maximumFirepower = Config.CraftFirepowerLimits.get(craftName);
+        HashMap<String, Integer> cannonAmountMap = new HashMap<>();
 
         for (Cannon cannon: cannons) {
             String cannonName = cannon.getCannonDesign().getDesignName();
@@ -61,11 +62,21 @@ public class DetectionListener implements Listener {
                 return;
             }
             craftFirepower += Config.CannonFirepowerValues.get(cannonName);
+            cannonAmountMap.merge(cannonName, 1, Integer::sum);
         }
 
         if (craftFirepower > maximumFirepower) {
             event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Too much firepower"), maximumFirepower, craftFirepower));
             event.setCancelled(true);
+        }
+
+        for (var entry: cannonAmountMap.entrySet()) {
+            int max = Config.getMaxAllowedCannonOnCraft(craft, entry.getKey());
+            int count = entry.getValue();
+            if (max > -1 && count > max) {
+                event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Max cannons exceeded"), entry.getKey(), count, max));
+                event.setCancelled(true);
+            }
         }
 
         cannonsOnCraft.put(craft, cannons);
