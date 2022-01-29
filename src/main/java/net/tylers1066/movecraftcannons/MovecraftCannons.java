@@ -117,7 +117,7 @@ public final class MovecraftCannons extends JavaPlugin {
                     break;
                 }
                 getLogger().log(Level.INFO, "Loaded firepower value for " + cannonName);
-                Config.CannonFirepowerValues.put(cannonName, getConfig().getInt("CannonFirepower." + cannonName, 0));
+                Config.CannonFirepowerValues.put(cannonName, getConfig().getDouble("CannonFirepower." + cannonName, 0));
             }
 
             // Load absolute max allowed cannons for each craft:

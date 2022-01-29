@@ -50,7 +50,7 @@ public class DetectionListener implements Listener {
             return;
         }
 
-        int craftFirepower = 0;
+        double craftFirepower = 0;
         int maximumFirepower = Config.CraftFirepowerLimits.get(craftName);
         HashMap<String, Integer> cannonAmountMap = new HashMap<>();
 

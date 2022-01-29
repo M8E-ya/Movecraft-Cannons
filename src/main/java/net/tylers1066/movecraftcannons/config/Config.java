@@ -16,7 +16,7 @@ public class Config {
     // Damage Tracking
     public static boolean EnableCannonsTracking = false;
 
-    public static HashMap<String, Integer> CannonFirepowerValues = new HashMap<>();
+    public static HashMap<String, Double> CannonFirepowerValues = new HashMap<>();
     public static HashMap<String, Integer> CraftFirepowerLimits = new HashMap<>();
     public static HashMap<String, List<String>> CraftAllowedCannons = new HashMap<>();
     public static HashMap<String, List<MaxCannonEntry>> CraftMaxAllowedCannons = new HashMap<>();
