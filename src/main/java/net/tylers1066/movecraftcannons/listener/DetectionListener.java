@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.jetbrains.annotations.NotNull;
 
 import javax.print.attribute.HashAttributeSet;
 import java.util.HashMap;
@@ -87,6 +88,7 @@ public class DetectionListener implements Listener {
         cannonsOnCraft.remove(event.getCraft());
     }
 
+    @NotNull
     public static Set<Cannon> getCannonsOnCraft(Craft craft) {
         return cannonsOnCraft.getOrDefault(craft, new HashSet<>());
     }

@@ -13,8 +13,9 @@ import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.util.MathUtils;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
-import net.tylers1066.movecraftcannons.aiming.AimingCommand;
+import net.tylers1066.movecraftcannons.commands.AimingCommand;
 import net.tylers1066.movecraftcannons.aiming.AimingListener;
+import net.tylers1066.movecraftcannons.firing.FireCommand;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
@@ -146,6 +147,7 @@ public final class MovecraftCannons extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new AimingListener(), this);
 
             this.getCommand("aim").setExecutor(new AimingCommand());
+            this.getCommand("fire").setExecutor(new FireCommand());
         }
     }
 

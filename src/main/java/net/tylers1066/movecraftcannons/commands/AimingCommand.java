@@ -1,4 +1,4 @@
-package net.tylers1066.movecraftcannons.aiming;
+package net.tylers1066.movecraftcannons.commands;
 
 import at.pavlov.cannons.Cannons;
 import com.palmergames.bukkit.towny.TownyAPI;
@@ -8,6 +8,7 @@ import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.PlayerCraft;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import net.tylers1066.movecraftcannons.aiming.AimingUtils;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
 import org.bukkit.command.Command;
