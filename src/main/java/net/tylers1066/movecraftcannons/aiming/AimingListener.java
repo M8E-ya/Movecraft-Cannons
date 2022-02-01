@@ -29,40 +29,6 @@ import org.bukkit.util.Vector;
 
 public class AimingListener implements Listener {
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onInteract(PlayerInteractEvent event) {
-        if (event.getItem() == null || event.getItem().getType() != Material.CLOCK) {
-            return;
-        }
-
-        Player player = event.getPlayer();
-        Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
-        if (craft == null) {
-            return;
-        }
-
-        if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            var cannons = DetectionListener.cannonsOnCraft.get(craft);
-            if (cannons == null) {
-                return;
-            }
-
-            Vector targetVector = AimingUtils.getPlayerTargetVector(player);
-            int numCannons = 0;
-            for (Cannon cannon: cannons) {
-                if (AimingUtils.cannonCanFireAtVector(cannon, targetVector)) {
-                    Cannons.getPlugin().getFireCannon().redstoneFiring(cannon, InteractAction.fireAutoaim);
-                    numCannons++;
-                }
-            }
-            player.sendActionBar(Component.text(String.format(I18nSupport.getInternationalisedString("Firing cannons"), numCannons), TextColor.color(0xc3f09e)));
-        }
-
-        else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            AimingUtils.aimCannonsOnCraft(craft, player, null);
-        }
-    }
-
     @EventHandler
     public void onRightClick(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) {

@@ -90,6 +90,9 @@ public class DetectionListener implements Listener {
 
     @NotNull
     public static Set<Cannon> getCannonsOnCraft(Craft craft) {
-        return cannonsOnCraft.getOrDefault(craft, new HashSet<>());
+        if (cannonsOnCraft.containsKey(craft)) {
+            return new HashSet<>(cannonsOnCraft.get(craft));
+        }
+        return new HashSet<>();
     }
 }
