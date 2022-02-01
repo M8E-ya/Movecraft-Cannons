@@ -9,6 +9,7 @@ import net.kyori.adventure.text.format.TextColor;
 import net.tylers1066.movecraftcannons.aiming.AimingUtils;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,18 @@ public class FiringUtils {
                 }
             }
             fireCannon(cannon);
+        }
+
+        player.sendActionBar(Component.text(String.format(I18nSupport.getInternationalisedString("Firing cannons"), numCannons), TextColor.color(0xc3f09e)));
+    }
+
+    public static void fireCannons(Player player, Set<Cannon> cannons, BlockFace direction) {
+        int numCannons = 0;
+        for (Cannon cannon: cannons) {
+            if (cannon.getCannonDirection() == direction) {
+                fireCannon(cannon);
+                numCannons++;
+            }
         }
 
         player.sendActionBar(Component.text(String.format(I18nSupport.getInternationalisedString("Firing cannons"), numCannons), TextColor.color(0xc3f09e)));

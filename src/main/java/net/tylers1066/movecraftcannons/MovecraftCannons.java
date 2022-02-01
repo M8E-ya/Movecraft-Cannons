@@ -17,6 +17,7 @@ import net.tylers1066.movecraftcannons.commands.AimingCommand;
 import net.tylers1066.movecraftcannons.aiming.AimingListener;
 import net.tylers1066.movecraftcannons.firing.FireCommand;
 import net.tylers1066.movecraftcannons.config.Config;
+import net.tylers1066.movecraftcannons.firing.FireSign;
 import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.type.MaxCannonsProperty;
@@ -146,6 +147,7 @@ public final class MovecraftCannons extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new CannonListener(), this);
             getServer().getPluginManager().registerEvents(new AimingListener(), this);
             getServer().getPluginManager().registerEvents(new ClockListener(), this);
+            getServer().getPluginManager().registerEvents(new FireSign(), this);
 
             this.getCommand("aim").setExecutor(new AimingCommand());
             this.getCommand("fire").setExecutor(new FireCommand());
