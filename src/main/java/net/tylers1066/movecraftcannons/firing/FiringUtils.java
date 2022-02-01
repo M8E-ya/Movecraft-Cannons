@@ -32,7 +32,9 @@ public class FiringUtils {
                     numCannons++;
                 }
             }
-            fireCannon(cannon);
+            else {
+                fireCannon(cannon);
+            }
         }
 
         player.sendActionBar(Component.text(String.format(I18nSupport.getInternationalisedString("Firing cannons"), numCannons), TextColor.color(0xc3f09e)));
