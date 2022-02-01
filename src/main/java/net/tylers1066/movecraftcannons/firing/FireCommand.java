@@ -63,20 +63,7 @@ public class FireCommand implements TabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        Player player = (Player) sender;
-
-        Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
-        if (craft == null) {
-            return Collections.emptyList();
-        }
-
-        List<String> cannonsOnCraft = DetectionListener.getCannonsOnCraft(craft).stream()
-                .map(cannon -> cannon.getCannonDesign().getDesignName())
-                .collect(Collectors.toList());
-
-        if (cannonsOnCraft.isEmpty()) {
-            return Collections.emptyList();
-        }
+        List<String> cannonsOnCraft = MovecraftUtils.getCannonTypesOnPlayerCurrentCraft((Player) sender);
 
         if (args.length == 1) {
             return StringUtil.copyPartialMatches(args[0], cannonsOnCraft, new ArrayList<>());

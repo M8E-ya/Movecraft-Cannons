@@ -10,4 +10,4 @@ commands:
   aim:
     description: Aim cannons facing in the direction you are looking at while on a ship.
   fire:
-    description: Aim cannons facing in the direction you are looking at while on a ship.
+    description: Fire cannons facing in the direction you are looking at while on a ship.

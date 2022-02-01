@@ -1,4 +1,4 @@
-package net.tylers1066.movecraftcannons.commands;
+package net.tylers1066.movecraftcannons.aiming;
 
 import at.pavlov.cannons.Cannons;
 import com.palmergames.bukkit.towny.TownyAPI;
@@ -15,6 +15,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,13 +59,12 @@ public class AimingCommand implements TabExecutor {
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String s, @NotNull String[] args) {
+        List<String> cannonsOnCraft = MovecraftUtils.getCannonTypesOnPlayerCurrentCraft((Player) sender);
+
         if (args.length == 1) {
-            ArrayList<String> tabCompletions = new ArrayList<>();
-            tabCompletions.add("all");
-            tabCompletions.addAll(Cannons.getPlugin().getDesignStorage().getDesignIds());
-            return tabCompletions;
+            return StringUtil.copyPartialMatches(args[0], cannonsOnCraft, new ArrayList<>());
         }
-        return Collections.emptyList();
+        return cannonsOnCraft;
     }
 }

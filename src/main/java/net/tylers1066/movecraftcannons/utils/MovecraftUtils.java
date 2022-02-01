@@ -9,13 +9,15 @@ import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.craft.SubCraftImpl;
 import net.countercraft.movecraft.util.MathUtils;
+import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class MovecraftUtils {
 
@@ -71,5 +73,23 @@ public class MovecraftUtils {
             }
         }
         return crafts;
+    }
+
+    @NotNull
+    public static List<String> getCannonTypesOnPlayerCurrentCraft(Player player) {
+        Craft craft = MovecraftUtils.getCurrentShip(player);
+        if (craft == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> cannonsOnCraft = DetectionListener.getCannonsOnCraft(craft).stream()
+                .map(cannon -> cannon.getCannonDesign().getDesignName())
+                .collect(Collectors.toList());
+
+        if (cannonsOnCraft.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return cannonsOnCraft;
     }
 }
