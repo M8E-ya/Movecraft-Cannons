@@ -67,7 +67,7 @@ public class DetectionListener implements Listener {
         }
 
         if (craftFirepower > maximumFirepower) {
-            event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Too much firepower"), maximumFirepower, craftFirepower));
+            event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Too much firepower"), maximumFirepower, (int) craftFirepower));
             event.setCancelled(true);
         }
 
