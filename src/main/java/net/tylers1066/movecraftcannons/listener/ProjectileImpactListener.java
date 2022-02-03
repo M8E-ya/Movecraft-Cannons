@@ -6,13 +6,11 @@ import net.countercraft.movecraft.combat.features.tracking.events.CraftDamagedBy
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
-import net.countercraft.movecraft.combat.tracking.DamageManager;
-import net.countercraft.movecraft.craft.*;
+import net.countercraft.movecraft.craft.SubCraftImpl;
 import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.damagetype.ProjectileImpactDamage;
-import org.bukkit.Bukkit;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;

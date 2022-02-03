@@ -4,7 +4,8 @@ import at.pavlov.cannons.Aiming;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.utils.CannonsUtil;
-import net.countercraft.movecraft.combat.config.Config;
+import net.countercraft.movecraft.combat.MovecraftCombat;
+import net.countercraft.movecraft.combat.features.directors.Directors;
 import net.countercraft.movecraft.craft.Craft;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
@@ -73,7 +74,7 @@ public class AimingUtils {
     @NotNull
     public static Vector getPlayerTargetVector(Player player) {
         // TODO: use per-player no-tick view distance once it has been re-implemented
-        return player.getTargetBlock(Config.Transparent, player.getWorld().getViewDistance() * 16).getLocation().toVector();
+    return player.getTargetBlock(Directors.Transparent, player.getWorld().getViewDistance() * 16).getLocation().toVector();
     }
 
     public static boolean cannonCanFireAtVector(Cannon cannon, Vector targetVector) {
