@@ -23,14 +23,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import javax.print.DocFlavor;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 public class CannonListener implements Listener {
-    private final static BlockFace[] MUZZLE_ADJACENT = { BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
-    private final static BlockFace[] BARREL_ADJACENT = { BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
+    private final static BlockFace[] ADJACENT = { BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
 
 
     @EventHandler
@@ -81,44 +81,46 @@ public class CannonListener implements Listener {
         // Force cannon barrel to be uncovered
         List<Location> cannonLocations = cannon.getCannonDesign().getAllCannonBlocks(cannon);
         Block muzzle = cannon.getMuzzle().getBlock();
-        for (BlockFace face : MUZZLE_ADJACENT) {
+
+        for (BlockFace face: ADJACENT) {
             if (!event.isCancelled()) {
                 Block adjacentBlock = muzzle.getRelative(face);
-                if (cannonLocations.contains(adjacentBlock.getLocation())) {
-                    checkIfBlockCoveredAndNext(cannonLocations, muzzle.getRelative(face), event);
-                }
+                checkIfBlockCoveredAndNext(event, adjacentBlock, face, cannonLocations);
             }
         }
     }
 
-    private void checkIfBlockCoveredAndNext(List<Location> cannonLocations, Block block, CannonFireEvent event) {
+    private void checkIfBlockCoveredAndNext(CannonFireEvent event, Block block, BlockFace originatingFace, List<Location> cannonLocations) {
         if (!cannonLocations.contains(block.getLocation()) || block.getType() != Material.STONE_BRICK_WALL) {
             return;
         }
 
-        if (isBlockCovered(block)) {
-            sendMessageToCannonOperator(event.getCannon(), event.getPlayer(), Component.text("Failed to fire cannon: the barrel is covered!", NamedTextColor.RED));
+        if (isBlockCovered(block, originatingFace.getOppositeFace())) {
+            sendMessageToCannonOperator(event.getCannon(), event.getPlayer(),
+                    Component.text("One of your cannon's barrel blocks is covered. Make some space for it!", NamedTextColor.RED));
             event.setCancelled(true);
             return;
         }
 
-        // Proceed to the next barrel block, if found
-        for (BlockFace face : BARREL_ADJACENT) {
-            Block adjacentBlock = block.getRelative(face);
-            if (!event.isCancelled()) {
-                checkIfBlockCoveredAndNext(cannonLocations, adjacentBlock, event);
+        for (BlockFace face: ADJACENT) {
+            if (face == originatingFace.getOppositeFace()) {
+                continue;
             }
+            checkIfBlockCoveredAndNext(event, block.getRelative(face), face, cannonLocations);
         }
     }
 
-    private boolean isBlockCovered(Block block) {
+    private boolean isBlockCovered(Block block, BlockFace originatingFace) {
         int covered = 0;
-        for (BlockFace face : BARREL_ADJACENT) {
+        for (BlockFace face : ADJACENT) {
+            if (face == originatingFace) {
+                continue;
+            }
             Block adjacentBlock = block.getRelative(face);
             if (!adjacentBlock.getType().isAir()) {
                 covered++;
             }
-            if (covered > 2) {
+            if (covered > 1) {
                 return true;
             }
         }
