@@ -4,7 +4,6 @@ import at.pavlov.cannons.Enum.ProjectileCause;
 import at.pavlov.cannons.event.ProjectileImpactEvent;
 import at.pavlov.cannons.projectile.FlyingProjectile;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -71,18 +70,14 @@ public class ProjectileDeflection implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                Bukkit.broadcastMessage("success");
                 Vector vectdeflect = flyingProjectile.getVelocity().multiply(CoR * ((3 + Math.random()) / 4)); // Bounciness + some randomness (75% - 100%)
                 Location impactLoc = flyingProjectile.getImpactLocation().subtract(flyingProjectile.getVelocity().normalize().multiply(0.3));
 
-                if ((blockFaceHit == BlockFace.UP) || (blockFaceHit == BlockFace.DOWN))
-                    vectdeflect.setY(-vectdeflect.getY());
-
-                if ((blockFaceHit == BlockFace.EAST) || (blockFaceHit == BlockFace.WEST))
-                    vectdeflect.setY(-vectdeflect.getX());
-
-                if ((blockFaceHit == BlockFace.NORTH) || (blockFaceHit == BlockFace.SOUTH))
-                    vectdeflect.setY(-vectdeflect.getZ());
+                switch (blockFaceHit) {
+                    case UP, DOWN -> vectdeflect.setY(-vectdeflect.getY());
+                    case WEST, EAST -> vectdeflect.setX(-vectdeflect.getX());
+                    case NORTH, SOUTH -> vectdeflect.setZ(-vectdeflect.getZ());
+                }
 
                 MovecraftCannons.getCannonsPlugin().getProjectileManager().spawnProjectile(event.getProjectile(),
                         flyingProjectile.getShooterUID(), flyingProjectile.getSource(), flyingProjectile.getPlayerlocation(),
