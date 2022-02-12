@@ -23,10 +23,6 @@
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
-            <id>cannons-repo</id>
-            <url>https://github.com/DerPavlov/mvn-repo/raw/master/</url>
-        </repository>
-        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>

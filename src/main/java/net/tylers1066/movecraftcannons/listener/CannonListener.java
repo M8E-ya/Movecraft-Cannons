@@ -14,16 +14,13 @@ import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import javax.print.DocFlavor;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

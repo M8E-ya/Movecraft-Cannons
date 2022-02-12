@@ -64,3 +64,9 @@ AllowedCannons:
 AbsoluteMaxAllowedCannons:
   Admin:
     Cannon: 1
+
+MaterialDeflectionFactors:
+  COMMAND_BLOCK: 1.0
+
+MaterialCoefficientOfRestitution:
+  COMMAND_BLOCK: 1.0

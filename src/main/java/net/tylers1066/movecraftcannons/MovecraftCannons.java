@@ -22,7 +22,9 @@ import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.type.MaxCannonsProperty;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -147,7 +149,38 @@ public final class MovecraftCannons extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new CannonListener(), this);
             getServer().getPluginManager().registerEvents(new AimingListener(), this);
             getServer().getPluginManager().registerEvents(new ClockListener(), this);
-            getServer().getPluginManager().registerEvents(new FireSign(), this);
+
+            ConfigurationSection materialDeflectionSection = getConfig().getConfigurationSection("MaterialDeflectionFactors");
+            if (materialDeflectionSection == null) {
+                getLogger().severe("Config is missing MaterialDeflectionFactors section!");
+            }
+            else {
+                for (Map.Entry<String, Object> deflectionEntry : materialDeflectionSection.getValues(false).entrySet()) {
+                    Material material = Material.matchMaterial(deflectionEntry.getKey());
+                    if (material == null) {
+                        getLogger().severe("Invalid material: " + deflectionEntry.getKey());
+                        continue;
+                    }
+                    ProjectileDeflection.getMaterialDeflectionMap().put(material, (double) deflectionEntry.getValue());
+                }
+            }
+
+            ConfigurationSection materialCoRSection = getConfig().getConfigurationSection("MaterialCoefficientOfRestitution");
+            if (materialCoRSection == null) {
+                getLogger().severe("Config is missing MaterialCoefficientOfRestitution section!");
+            }
+            else {
+                for (Map.Entry<String, Object> corEntry : materialCoRSection.getValues(false).entrySet()) {
+                    Material material = Material.matchMaterial(corEntry.getKey());
+                    if (material == null) {
+                        getLogger().severe("Invalid material: " + corEntry.getKey());
+                        continue;
+                    }
+                    ProjectileDeflection.getMaterialCoRMap().put(material, (double) corEntry.getValue());
+                }
+            }
+
+            getServer().getPluginManager().registerEvents(new ProjectileDeflection(), this);
 
             this.getCommand("aim").setExecutor(new AimingCommand());
             this.getCommand("fire").setExecutor(new FireCommand());
@@ -205,6 +238,9 @@ public final class MovecraftCannons extends JavaPlugin {
         return getCannonsInHitBox(c.getHitBox(), c.getWorld());
     }
 
+    public static Cannons getCannonsPlugin() {
+        return cannonsPlugin;
+    }
 }
 
 
