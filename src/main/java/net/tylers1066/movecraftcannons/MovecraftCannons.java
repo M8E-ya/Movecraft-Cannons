@@ -12,6 +12,7 @@ import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.util.MathUtils;
+import net.countercraft.movecraft.util.Tags;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
 import net.tylers1066.movecraftcannons.aiming.AimingCommand;
 import net.tylers1066.movecraftcannons.aiming.AimingListener;
@@ -157,12 +158,14 @@ public final class MovecraftCannons extends JavaPlugin {
             }
             else {
                 for (Map.Entry<String, Object> deflectionEntry : materialDeflectionSection.getValues(false).entrySet()) {
-                    Material material = Material.matchMaterial(deflectionEntry.getKey());
-                    if (material == null) {
+                    Set<Material> materials = Tags.parseMaterials(deflectionEntry.getKey());
+                    if (materials.isEmpty()) {
                         getLogger().severe("Invalid material: " + deflectionEntry.getKey());
                         continue;
                     }
-                    ProjectileDeflection.getMaterialDeflectionMap().put(material, (double) deflectionEntry.getValue());
+                    for (Material material : materials) {
+                        ProjectileDeflection.getMaterialDeflectionMap().put(material, (double) deflectionEntry.getValue());
+                    }
                 }
             }
 
@@ -172,12 +175,14 @@ public final class MovecraftCannons extends JavaPlugin {
             }
             else {
                 for (Map.Entry<String, Object> corEntry : materialCoRSection.getValues(false).entrySet()) {
-                    Material material = Material.matchMaterial(corEntry.getKey());
-                    if (material == null) {
+                    Set<Material> materials = Tags.parseMaterials(corEntry.getKey());
+                    if (materials.isEmpty()) {
                         getLogger().severe("Invalid material: " + corEntry.getKey());
                         continue;
                     }
-                    ProjectileDeflection.getMaterialCoRMap().put(material, (double) corEntry.getValue());
+                    for (Material material : materials) {
+                        ProjectileDeflection.getMaterialCoRMap().put(material, (double) corEntry.getValue());
+                    }
                 }
             }
 

@@ -4,6 +4,7 @@ import at.pavlov.cannons.Enum.ProjectileCause;
 import at.pavlov.cannons.event.ProjectileImpactEvent;
 import at.pavlov.cannons.projectile.FlyingProjectile;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
@@ -64,7 +65,6 @@ public class ProjectileDeflection implements Listener {
 
         // Cancel the original impact
         event.setCancelled(true);
-        impactBlock.getWorld().spawnParticle(Particle.ELECTRIC_SPARK, impactBlock, 10, 0, 0, 0, 1, null, true);
 
         // Spawn a new deflected cannonball
         new BukkitRunnable() {
@@ -72,6 +72,7 @@ public class ProjectileDeflection implements Listener {
             public void run() {
                 Vector vectdeflect = flyingProjectile.getVelocity().multiply(CoR * ((3 + Math.random()) / 4)); // Bounciness + some randomness (75% - 100%)
                 Location impactLoc = flyingProjectile.getImpactLocation().subtract(flyingProjectile.getVelocity().normalize().multiply(0.3));
+                impactLoc.getWorld().spawnParticle(Particle.SCRAPE, impactLoc, 10, 1, 0, 1, 0, null, true);
 
                 switch (blockFaceHit) {
                     case UP, DOWN -> vectdeflect.setY(-vectdeflect.getY());
