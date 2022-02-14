@@ -52,6 +52,10 @@ public class ProjectileImpactListener implements Listener {
 
         Craft originCraft = null;
         Location cannonLocation = Cannons.getPlugin().getCannon(event.getFlyingProjectile().getCannonUID()).getLocation();
+        if (cannonLocation == null) {
+            return;
+        }
+
         for (Craft craft: CraftManager.getInstance().getCraftsInWorld(event.getFlyingProjectile().getWorld())) {
             if (MathUtils.locationNearHitBox(craft.getHitBox(), cannonLocation, 1D)) {
                 originCraft = craft;
