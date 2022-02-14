@@ -1,6 +1,8 @@
 package net.tylers1066.movecraftcannons.listener;
 
+import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.event.ProjectileImpactEvent;
+import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.features.tracking.DamageRecord;
 import net.countercraft.movecraft.combat.features.tracking.events.CraftDamagedByEvent;
 import net.countercraft.movecraft.craft.Craft;
@@ -47,24 +49,24 @@ public class ProjectileImpactListener implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void antiFriendlyFireListener(ProjectileImpactEvent event) {
         Location impactLocation = event.getImpactLocation();
-        Player cannoneer = Bukkit.getPlayer(event.getShooterUID());
-        if (cannoneer == null) {
+
+        Craft originCraft = null;
+        Location cannonLocation = Cannons.getPlugin().getCannon(event.getFlyingProjectile().getCannonUID()).getLocation();
+        for (Craft craft: CraftManager.getInstance().getCraftsInWorld(event.getFlyingProjectile().getWorld())) {
+            if (MathUtils.locationNearHitBox(craft.getHitBox(), cannonLocation, 1D)) {
+                originCraft = craft;
+                break;
+            }
+        }
+        // Blast did not originate from a craft - we ignore
+        if (originCraft == null) {
             return;
         }
 
-        Craft craft = CraftManager.getInstance().getCraftByPlayer(cannoneer);
-        if (craft == null) {
-            // The cannon operator may be part of the crew, but not as a pilot:
-            craft = MovecraftUtils.getCurrentShip(cannoneer);
-            if (craft == null) {
-                return;
-            }
-        }
-
-        if (MathUtils.locationNearHitBox(craft.getHitBox(), impactLocation, 1.0)) {
+        if (MathUtils.locationNearHitBox(originCraft.getHitBox(), impactLocation, 1.0)) {
             Set<Craft> craftsAtImpactLocation = MovecraftUtils.getPlayerCraftsAtLocation(impactLocation);
-            craftsAtImpactLocation.remove(craft);
-            if (craft instanceof SubCraftImpl subCraft) {
+            craftsAtImpactLocation.remove(originCraft);
+            if (originCraft instanceof SubCraftImpl subCraft) {
                 craftsAtImpactLocation.remove(subCraft.getParent());
             }
 
