@@ -57,7 +57,7 @@ public class ProjectileDeflection implements Listener {
 
         double deflectionVelocityFactor = 1.0;
         double angleOfImpact = Math.toDegrees(flyingProjectile.getVelocity().angle(blockFaceHit.getDirection()));
-        double deflectionChance = ((angleOfImpact + 0.01) / 90) * (deflectionVelocityFactor / flyingProjectile.getVelocity().length()) * blockDeflectionFactor * projDeflectionFactor;
+        double deflectionChance = (Math.pow((angleOfImpact + 0.01), 2) / Math.pow(90, 2)) * (deflectionVelocityFactor / flyingProjectile.getVelocity().length()) * blockDeflectionFactor * projDeflectionFactor;
 
         if (Math.random() > deflectionChance) {
             return;
