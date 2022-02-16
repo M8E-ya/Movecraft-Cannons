@@ -53,7 +53,7 @@ public class CannonListener implements Listener {
         DetectionListener.cannonsOnCraft.computeIfAbsent(craft, k -> new LinkedHashSet<>()).add(cannon);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onCannonDestroy(CannonDestroyedEvent event) {
         for (Set<Cannon> cannons: DetectionListener.cannonsOnCraft.values()) {
             cannons.remove(event.getCannon());

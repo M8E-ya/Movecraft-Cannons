@@ -1,9 +1,11 @@
 package net.tylers1066.movecraftcannons.scoreboard;
 
 import at.pavlov.cannons.cannon.Cannon;
+import at.pavlov.cannons.event.CannonDestroyedEvent;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PilotedCraft;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
@@ -18,6 +20,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
@@ -69,6 +72,22 @@ public class WeaponsScoreboard implements Listener {
         }
 
         removeWeaponsScoreboard(pcraft.getPilot());
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL) // Run before we remove the cannon from the ship
+    public void onCannonDestroy(CannonDestroyedEvent event) {
+        Cannon cannon = event.getCannon();
+        for (var entry: DetectionListener.cannonsOnCraft.entrySet()) {
+
+            if (!(entry.getKey() instanceof PilotedCraft pcraft) || !entry.getValue().contains(cannon)) {
+                continue;
+            }
+
+            Team team = pcraft.getPilot().getScoreboard().getTeam(cannon.getUID().toString());
+            if (team != null) {
+                team.prefix(Component.text(cannon.getCannonDesign().getMessageName(), NamedTextColor.DARK_RED));
+            }
+        }
     }
 
     @EventHandler
@@ -144,7 +163,7 @@ public class WeaponsScoreboard implements Listener {
                 .append(Component.text(" (" + shortenBlockFace(cannon.getCannonDirection()) + ")", NamedTextColor.WHITE));
 
         if (cannon.isLoaded() && cannon.getChargesRemaining() > 1) {
-            line.append(Component.text(" - " + cannon.getChargesRemaining() + " charge(s)", NamedTextColor.WHITE));
+            line.append(Component.text(" - " + cannon.getChargesRemaining() + " charges", NamedTextColor.WHITE));
         }
 
         return line.build();
