@@ -21,7 +21,9 @@ import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.firing.FireSign;
 import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import net.tylers1066.movecraftcannons.scoreboard.WeaponsScoreboard;
 import net.tylers1066.movecraftcannons.type.MaxCannonsProperty;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -34,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 
 public final class MovecraftCannons extends JavaPlugin {
@@ -151,6 +154,7 @@ public final class MovecraftCannons extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new AimingListener(), this);
             getServer().getPluginManager().registerEvents(new ClockListener(), this);
             getServer().getPluginManager().registerEvents(new FireSign(), this);
+            getServer().getPluginManager().registerEvents(new WeaponsScoreboard(), this);
 
             ConfigurationSection materialDeflectionSection = getConfig().getConfigurationSection("MaterialDeflectionFactors");
             if (materialDeflectionSection == null) {
@@ -198,7 +202,7 @@ public final class MovecraftCannons extends JavaPlugin {
         // Plugin shutdown logic
     }
 
-    public HashSet<Cannon> getCannons(@NotNull HitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
+    public LinkedHashSet<Cannon> getCannons(@NotNull HitBox hitbox, @NotNull World world, @Nullable UUID uuid) {
         List<Location> shipLocations = new ArrayList<>();
         for (MovecraftLocation loc : hitbox) {
             shipLocations.add(loc.toBukkit(world));
@@ -221,7 +225,9 @@ public final class MovecraftCannons extends JavaPlugin {
             }
             cannonLocations.add(firingTriggerLocation);
         }
-        return foundCannons;
+        return foundCannons.stream()
+                .sorted(Comparator.comparing(Cannon::getDesignID)) // Sort alphabetically
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Set<Cannon> getCannonsInHitBox(HitBox hitBox, World world) {

@@ -6,6 +6,7 @@ import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
+import net.countercraft.movecraft.events.CraftSinkEvent;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
@@ -17,14 +18,11 @@ import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
 import javax.print.attribute.HashAttributeSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class DetectionListener implements Listener {
 
-    public static HashMap<Craft, HashSet<Cannon>> cannonsOnCraft = new HashMap<>();
+    public static HashMap<Craft, LinkedHashSet<Cannon>> cannonsOnCraft = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
@@ -46,7 +44,7 @@ public class DetectionListener implements Listener {
             return;
         }
 
-        HashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), uuid);
+        LinkedHashSet<Cannon> cannons = MovecraftCannons.getInstance().getCannons(craft.getHitBox(), craft.getWorld(), uuid);
         if (cannons.isEmpty()) {
             return;
         }
@@ -58,7 +56,7 @@ public class DetectionListener implements Listener {
         for (Cannon cannon: cannons) {
             String cannonName = cannon.getCannonDesign().getDesignName();
             if (!Config.CraftAllowedCannons.get(craftName).contains(cannonName)) {
-                event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Disallowed cannon"), cannonName));
+                event.setFailMessage(String.format(I18nSupport.getInternationalisedString("Disallowed cannon"), cannon.getCannonDesign().getMessageName()));
                 event.setCancelled(true);
                 return;
             }
@@ -89,10 +87,10 @@ public class DetectionListener implements Listener {
     }
 
     @NotNull
-    public static Set<Cannon> getCannonsOnCraft(Craft craft) {
+    public static LinkedHashSet<Cannon> getCannonsOnCraft(Craft craft) {
         if (cannonsOnCraft.containsKey(craft)) {
-            return new HashSet<>(cannonsOnCraft.get(craft));
+            return new LinkedHashSet<>(cannonsOnCraft.get(craft));
         }
-        return new HashSet<>();
+        return new LinkedHashSet<>();
     }
 }

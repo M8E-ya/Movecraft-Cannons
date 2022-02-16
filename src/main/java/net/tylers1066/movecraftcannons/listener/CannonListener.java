@@ -21,10 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class CannonListener implements Listener {
     private final static BlockFace[] ADJACENT = { BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
@@ -53,7 +50,7 @@ public class CannonListener implements Listener {
         if (!Config.CraftAllowedCannons.get(craft.getType().getStringProperty(CraftType.NAME)).contains(cannon.getCannonDesign().getDesignName())) {
             return;
         }
-        DetectionListener.cannonsOnCraft.computeIfAbsent(craft, k -> new HashSet<>()).add(cannon);
+        DetectionListener.cannonsOnCraft.computeIfAbsent(craft, k -> new LinkedHashSet<>()).add(cannon);
     }
 
     @EventHandler
