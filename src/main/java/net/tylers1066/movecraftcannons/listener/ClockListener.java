@@ -1,6 +1,9 @@
 package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.Cannons;
+import me.halfquark.squadronsreloaded.squadron.Squadron;
+import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
+import me.halfquark.squadronsreloaded.squadron.SquadronManager;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -60,6 +63,16 @@ public class ClockListener implements Listener {
             }
 
             FiringUtils.fireCannons(player, cannons, true);
+
+            if (SquadronManager.getInstance().hasSquadron(player)) {
+                Squadron squad = SquadronManager.getInstance().getPlayerSquadron(player, true);
+                if (squad == null)
+                    return;
+                for (SquadronCraft squadCraft: squad.getCrafts()) {
+                    var squadCraftCannons = DetectionListener.getCannonsOnCraft(squadCraft);
+                    FiringUtils.fireCannons(player, squadCraftCannons, true);
+                }
+            }
         }
 
         // Right-click - aim

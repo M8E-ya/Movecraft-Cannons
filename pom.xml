@@ -85,6 +85,13 @@
             <artifactId>Towny</artifactId>
             <version>0.97.5.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.HalfQuark</groupId>
+            <artifactId>SquadronsReloaded</artifactId>
+            <version>3.0.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../../SquadronsReloaded/target/SquadronsReloaded-3.0.2.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>

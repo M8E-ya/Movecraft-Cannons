@@ -1,6 +1,7 @@
 package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.cannon.Cannon;
+import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
 import net.countercraft.movecraft.craft.*;
 import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.events.CraftDetectEvent;
@@ -37,8 +38,11 @@ public class DetectionListener implements Listener {
         if (craft instanceof SubCraftImpl) {
             return;
         }
-        if (craft instanceof PilotedCraft pilotedCraft) {
+        else if (craft instanceof PilotedCraft pilotedCraft) {
             uuid = pilotedCraft.getPilot().getUniqueId();
+        }
+        else if (craft instanceof SquadronCraft squadronCraft) {
+            uuid = squadronCraft.getSquadron().getPilot().getUniqueId();
         }
         else {
             return;
