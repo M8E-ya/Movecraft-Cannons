@@ -107,10 +107,10 @@ public class WeaponsScoreboard implements Listener {
 
         int num = 1;
         for (Cannon cannon: cannons) {
-            if (num > 13)
+            if (num > 15)
                 break;
 
-            Team cannonTeam = board.registerNewTeam(cannon.getUID().toString());
+            Team cannonTeam = board.registerNewTeam(cannon.getUID().toString().substring(0, 15));
             String entry = ChatColor.values()[num] + "";
             cannonTeam.addEntry(entry);
             cannonTeam.prefix(createCannonLine(cannon));
