@@ -137,7 +137,7 @@ public class WeaponsScoreboard implements Listener {
         }
 
         for (Cannon cannon: cannons) {
-            Team team =  board.getTeam(cannon.getUID().toString());
+            Team team =  board.getTeam(cannon.getUID().toString().substring(0, 15));
             if (team == null)
                 continue;
 
