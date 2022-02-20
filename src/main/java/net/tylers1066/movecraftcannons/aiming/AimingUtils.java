@@ -7,10 +7,13 @@ import at.pavlov.cannons.utils.CannonsUtil;
 import net.countercraft.movecraft.combat.MovecraftCombat;
 import net.countercraft.movecraft.combat.features.directors.Directors;
 import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
@@ -73,8 +76,14 @@ public class AimingUtils {
 
     @NotNull
     public static Vector getPlayerTargetVector(Player player) {
+        Location target = player.getTargetBlock(Directors.Transparent, player.getWorld().getViewDistance() * 16).getLocation();
         // TODO: use per-player no-tick view distance once it has been re-implemented
-    return player.getTargetBlock(Directors.Transparent, player.getWorld().getViewDistance() * 16).getLocation().toVector();
+        Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
+        // View blocked by own craft: use non-convergent aiming
+        if (craft != null && craft.getHitBox().contains(MathUtils.bukkit2MovecraftLoc(target))) {
+            return player.getEyeLocation().toVector();
+        }
+        return target.toVector();
     }
 
     public static boolean cannonCanFireAtVector(Cannon cannon, Vector targetVector) {

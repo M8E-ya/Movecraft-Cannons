@@ -6,6 +6,7 @@ import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
 import me.halfquark.squadronsreloaded.squadron.SquadronManager;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.type.CraftType;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.tylers1066.movecraftcannons.aiming.AimingUtils;
 import net.tylers1066.movecraftcannons.firing.FiringUtils;
@@ -51,6 +52,11 @@ public class ClockListener implements Listener {
 
         // Left-click - fire
         if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+            // Aerial crafts only fire on right-click
+            if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT)) {
+                return;
+            }
+
             var cannons = DetectionListener.getCannonsOnCraft(craft);
             if (cannons.isEmpty()) {
                 return;
@@ -78,6 +84,12 @@ public class ClockListener implements Listener {
         // Right-click - aim
         else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             AimingUtils.aimCannonsOnCraft(craft, player, selectedCannonType);
+
+            // Aerial crafts will also fire
+            if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT)) {
+                var cannons = DetectionListener.getCannonsOnCraft(craft);
+                FiringUtils.fireCannons(player, cannons, true);
+            }
         }
     }
 

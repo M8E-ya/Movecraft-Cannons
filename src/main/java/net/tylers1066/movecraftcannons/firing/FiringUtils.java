@@ -4,11 +4,15 @@ import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.Enum.InteractAction;
 import at.pavlov.cannons.cannon.Cannon;
 import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.tylers1066.movecraftcannons.aiming.AimingUtils;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -68,6 +72,12 @@ public class FiringUtils {
     @NotNull
     public static Vector getPlayerFiringVector(Player player) {
         // TODO: use per-player no-tick view distance once it has been re-implemented
-        return player.getTargetBlock(materialSet, player.getViewDistance() * 16).getLocation().toVector();
+        Location target = player.getTargetBlock(materialSet, player.getViewDistance() * 16).getLocation();
+        Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
+        // View blocked by own craft: use non-convergent aiming
+        if (craft != null && craft.getHitBox().contains(MathUtils.bukkit2MovecraftLoc(target))) {
+            return player.getEyeLocation().toVector();
+        }
+        return target.toVector();
     }
 }
