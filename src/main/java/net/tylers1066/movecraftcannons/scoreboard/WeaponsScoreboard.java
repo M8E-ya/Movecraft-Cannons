@@ -28,6 +28,8 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -176,7 +178,7 @@ public class WeaponsScoreboard implements Listener {
     }
 
     private Component createHullIntegrityLine(Craft craft) {
-        int percentage = (craft.getTotalNonNegligibleBlocks() / craft.getOrigBlockCount()) * 100;
+        int percentage = (int) (((double) craft.getTotalNonNegligibleBlocks() / (double) craft.getOrigBlockCount()) * 100);
 
         var line = Component.text()
                 .append(Component.text("Hull Integrity: ", NamedTextColor.WHITE, TextDecoration.BOLD))
