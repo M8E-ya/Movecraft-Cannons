@@ -60,7 +60,7 @@ public class WeaponsScoreboard implements Listener {
 
         LinkedHashSet<Cannon> cannons = DetectionListener.getCannonsOnCraft(craft);
         if (!cannons.isEmpty()) {
-            createWeaponsScoreboard(pcraft.getPilot(), cannons);
+            createWeaponsScoreboard(pcraft, cannons);
         }
     }
 
@@ -100,9 +100,9 @@ public class WeaponsScoreboard implements Listener {
         removeWeaponsScoreboard(pcraft.getPilot());
     }
 
-    public void createWeaponsScoreboard(Player player, LinkedHashSet<Cannon> cannons) {
+    public void createWeaponsScoreboard(PilotedCraft craft, LinkedHashSet<Cannon> cannons) {
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
-        Objective obj = board.registerNewObjective("Weapons", "dummy", Component.text("Weapons", NamedTextColor.GRAY, TextDecoration.BOLD));
+        Objective obj = board.registerNewObjective("CraftHUD", "dummy", createHullIntegrityLine(craft));
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         int num = 1;
@@ -120,8 +120,8 @@ public class WeaponsScoreboard implements Listener {
             num++;
         }
 
-        hasWeaponsScoreboard.add(player.getUniqueId());
-        player.setScoreboard(board);
+        hasWeaponsScoreboard.add(craft.getPilot().getUniqueId());
+        craft.getPilot().setScoreboard(board);
     }
 
     public void updateWeaponsScoreboard(Player player) {
@@ -130,6 +130,12 @@ public class WeaponsScoreboard implements Listener {
             return;
 
         Scoreboard board = player.getScoreboard();
+
+        Objective obj = board.getObjective("CraftHUD");
+        if (obj == null) {
+            return;
+        }
+        obj.displayName(createHullIntegrityLine(craft));
 
         LinkedHashSet<Cannon> cannons = DetectionListener.getCannonsOnCraft(craft);
         if (cannons.isEmpty()) {
@@ -151,7 +157,7 @@ public class WeaponsScoreboard implements Listener {
 
     public void removeWeaponsScoreboard(Player player) {
         Scoreboard board = player.getScoreboard();
-        if (board.getObjective("Weapons") != null) {
+        if (board.getObjective("CraftHUD") != null) {
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         }
         hasWeaponsScoreboard.remove(player.getUniqueId());
@@ -165,6 +171,16 @@ public class WeaponsScoreboard implements Listener {
         if (cannon.isLoaded() && cannon.getChargesRemaining() > 1) {
             line.append(Component.text(" - " + cannon.getChargesRemaining() + " charges", NamedTextColor.WHITE));
         }
+
+        return line.build();
+    }
+
+    private Component createHullIntegrityLine(Craft craft) {
+        int percentage = (craft.getTotalNonNegligibleBlocks() / craft.getOrigBlockCount()) * 100;
+
+        var line = Component.text()
+                .append(Component.text("Hull Integrity: ", NamedTextColor.WHITE, TextDecoration.BOLD))
+                .append(Component.text(percentage + "%", getHullIntegrityColor(percentage)));
 
         return line.build();
     }
@@ -191,6 +207,17 @@ public class WeaponsScoreboard implements Listener {
             return TextColor.color(0xeb9d9d);
         }
     }
+
+    private TextColor getHullIntegrityColor(int percentage) {
+        if (percentage <= 100 && percentage >= 80) {
+            return NamedTextColor.GREEN;
+        }
+        else if (percentage < 80 && percentage >= 70) {
+            return NamedTextColor.YELLOW;
+        }
+        return NamedTextColor.RED;
+    }
+
 
     private String shortenBlockFace(BlockFace face) {
         return switch (face) {

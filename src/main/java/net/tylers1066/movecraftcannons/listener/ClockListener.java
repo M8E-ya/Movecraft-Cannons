@@ -69,16 +69,6 @@ public class ClockListener implements Listener {
             }
 
             FiringUtils.fireCannons(player, cannons, true);
-
-            if (SquadronManager.getInstance().hasSquadron(player)) {
-                Squadron squad = SquadronManager.getInstance().getPlayerSquadron(player, true);
-                if (squad == null)
-                    return;
-                for (SquadronCraft squadCraft: squad.getCrafts()) {
-                    var squadCraftCannons = DetectionListener.getCannonsOnCraft(squadCraft);
-                    FiringUtils.fireCannons(player, squadCraftCannons, true);
-                }
-            }
         }
 
         // Right-click - aim
@@ -89,6 +79,16 @@ public class ClockListener implements Listener {
             if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT)) {
                 var cannons = DetectionListener.getCannonsOnCraft(craft);
                 FiringUtils.fireCannons(player, cannons, true);
+            }
+
+            if (SquadronManager.getInstance().hasSquadron(player)) {
+                Squadron squad = SquadronManager.getInstance().getPlayerSquadron(player, true);
+                if (squad == null)
+                    return;
+                for (SquadronCraft squadCraft: squad.getCrafts()) {
+                    var squadCraftCannons = DetectionListener.getCannonsOnCraft(squadCraft);
+                    FiringUtils.fireCannons(player, squadCraftCannons, true);
+                }
             }
         }
     }
