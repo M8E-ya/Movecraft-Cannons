@@ -2,10 +2,7 @@ package net.tylers1066.movecraftcannons.scoreboard;
 
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
-import net.countercraft.movecraft.craft.Craft;
-import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.craft.PilotedCraft;
-import net.countercraft.movecraft.craft.PlayerCraft;
+import net.countercraft.movecraft.craft.*;
 import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
@@ -93,7 +90,7 @@ public class WeaponsScoreboard implements Listener {
     @EventHandler
     public void onCraftRelease(CraftReleaseEvent event) {
         Craft craft = event.getCraft();
-        if (!(craft instanceof PilotedCraft pcraft)) {
+        if (!(craft instanceof PlayerCraft pcraft)) {
             return;
         }
 
