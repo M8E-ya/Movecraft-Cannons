@@ -28,8 +28,6 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -56,7 +54,7 @@ public class WeaponsScoreboard implements Listener {
     @EventHandler
     public void onCraftPilot(CraftPilotEvent event) {
         Craft craft = event.getCraft();
-        if (!(craft instanceof PilotedCraft pcraft)) {
+        if (!(craft instanceof PlayerCraft pcraft)) {
             return;
         }
 
@@ -69,7 +67,7 @@ public class WeaponsScoreboard implements Listener {
     @EventHandler
     public void onCraftRelease(CraftSinkEvent event) {
         Craft craft = event.getCraft();
-        if (!(craft instanceof PilotedCraft pcraft)) {
+        if (!(craft instanceof PlayerCraft pcraft)) {
             return;
         }
 
@@ -81,7 +79,7 @@ public class WeaponsScoreboard implements Listener {
         Cannon cannon = event.getCannon();
         for (var entry: DetectionListener.cannonsOnCraft.entrySet()) {
 
-            if (!(entry.getKey() instanceof PilotedCraft pcraft) || !entry.getValue().contains(cannon)) {
+            if (!(entry.getKey() instanceof PlayerCraft pcraft) || !entry.getValue().contains(cannon)) {
                 continue;
             }
 
