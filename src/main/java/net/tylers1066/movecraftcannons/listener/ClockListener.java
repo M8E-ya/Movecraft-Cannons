@@ -53,7 +53,7 @@ public class ClockListener implements Listener {
         // Left-click - fire
         if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
             // Aerial crafts only fire on right-click
-            if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT)) {
+            if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
                 return;
             }
 
@@ -75,8 +75,8 @@ public class ClockListener implements Listener {
         else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             AimingUtils.aimCannonsOnCraft(craft, player, selectedCannonType);
 
-            // Aerial crafts will also fire
-            if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT)) {
+            // Aerial crafts will also fire, as well as aim
+            if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
                 var cannons = DetectionListener.getCannonsOnCraft(craft);
                 FiringUtils.fireCannons(player, cannons, true);
             }
