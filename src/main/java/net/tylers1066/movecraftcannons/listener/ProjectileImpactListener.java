@@ -29,8 +29,8 @@ public class ProjectileImpactListener implements Listener {
         if (!Config.EnableCannonsTracking)
             return;
 
-        Craft craft = CraftManager.getInstance().fastNearestCraftToLoc(e.getImpactLocation());
-        if (!(craft instanceof PlayerCraft))
+        Craft craft = MathUtils.fastNearestCraftToLoc(CraftManager.getInstance().getCraftsInWorld(e.getImpactLocation().getWorld()), e.getImpactLocation());
+        if (!(craft instanceof PlayerCraft playerCraft))
             return;
         if (!MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(e.getImpactLocation())))
             return;
@@ -40,7 +40,6 @@ public class ProjectileImpactListener implements Listener {
         if (cause == null || !cause.isOnline())
             return;
 
-        PlayerCraft playerCraft = (PlayerCraft) craft;
         DamageRecord record = new DamageRecord(cause, playerCraft.getPilot(), new ProjectileImpactDamage());
         CraftDamagedByEvent event = new CraftDamagedByEvent(playerCraft, record);
         Bukkit.getPluginManager().callEvent(event);
