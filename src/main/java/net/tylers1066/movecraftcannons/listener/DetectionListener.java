@@ -64,6 +64,7 @@ public class DetectionListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+            cannon.setOwner(uuid);
             craftFirepower += Config.CannonFirepowerValues.get(cannonName);
             cannonAmountMap.merge(cannonName, 1, Integer::sum);
         }
