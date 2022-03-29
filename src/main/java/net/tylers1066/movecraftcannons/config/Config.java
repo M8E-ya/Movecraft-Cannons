@@ -1,11 +1,10 @@
 package net.tylers1066.movecraftcannons.config;
 
+import at.pavlov.cannons.projectile.Projectile;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.type.CraftType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Config {
     public static boolean Debug = false;
@@ -16,10 +15,16 @@ public class Config {
     // Damage Tracking
     public static boolean EnableCannonsTracking = false;
 
-    public static HashMap<String, Double> CannonFirepowerValues = new HashMap<>();
-    public static HashMap<String, Integer> CraftFirepowerLimits = new HashMap<>();
-    public static HashMap<String, List<String>> CraftAllowedCannons = new HashMap<>();
-    public static HashMap<String, List<MaxCannonEntry>> CraftMaxAllowedCannons = new HashMap<>();
+    // Cannons
+    public static final Map<String, Double> CannonFirepowerValues = new HashMap<>();
+    public static final Map<String, Integer> CraftFirepowerLimits = new HashMap<>();
+    public static final Map<String, List<String>> CraftAllowedCannons = new HashMap<>();
+    public static final Map<String, List<MaxCannonEntry>> CraftMaxAllowedCannons = new HashMap<>();
+
+    // Projectiles
+    public static final Set<Projectile> HomingProjectiles = new HashSet<>();
+    public static final Set<Projectile> CountermeasureProjectiles = new HashSet<>();
+    public static double CountermeasureRange = 0;
 
     public static int getMaxAllowedCannonOnCraft(Craft craft, String cannonType) {
         String craftName = craft.getType().getStringProperty(CraftType.NAME);

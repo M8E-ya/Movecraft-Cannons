@@ -70,3 +70,11 @@ MaterialDeflectionFactors:
 
 MaterialCoefficientOfRestitution:
   COMMAND_BLOCK: 1.0
+
+HomingProjectiles:
+  - "AirLaunchedMissile"
+
+CountermeasureProjectiles:
+  - "Flare"
+
+CountermeasureRange: 100

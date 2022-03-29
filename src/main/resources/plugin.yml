@@ -2,7 +2,7 @@ name: Movecraft-Cannons
 version: ${project.version}
 main: net.tylers1066.movecraftcannons.MovecraftCannons
 api-version: 1.14
-depend: [Movecraft, Cannons, SquadronsReloaded]
+depend: [Movecraft, Cannons, SquadronsReloaded, Towny]
 softdepend: [Movecraft-Combat]
 authors: [TylerS1066]
 description: Integration between Movecraft and Cannons
@@ -11,3 +11,5 @@ commands:
     description: Aim cannons facing in the direction you are looking at while on a ship.
   fire:
     description: Fire cannons facing in the direction you are looking at while on a ship.
+  lockon:
+    description: Selects a target for homing projectiles.

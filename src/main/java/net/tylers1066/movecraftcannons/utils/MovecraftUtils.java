@@ -4,10 +4,7 @@ import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.utils.CombatUtil;
 import net.countercraft.movecraft.MovecraftLocation;
-import net.countercraft.movecraft.craft.Craft;
-import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.craft.PlayerCraft;
-import net.countercraft.movecraft.craft.SubCraftImpl;
+import net.countercraft.movecraft.craft.*;
 import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import org.bukkit.Location;
@@ -91,5 +88,28 @@ public class MovecraftUtils {
         }
 
         return cannonsOnCraft;
+    }
+
+    public static Location getCraftHitBoxMidPoint(Craft craft) {
+        return craft.getHitBox().getMidPoint().toBukkit(craft.getWorld());
+    }
+
+    @Nullable
+    public static Craft getNearestCraftToCraft(Craft origin, Set<Craft> crafts) {
+        Location originMidPoint = origin.getHitBox().getMidPoint().toBukkit(origin.getWorld());
+
+        Craft nearestCraft = null;
+        double nearestCraftDistanceSquared = Integer.MAX_VALUE;
+        for (Craft testCraft: crafts) {
+            if (testCraft.getWorld() != origin.getWorld()) {
+                continue;
+            }
+            double craftDistanceSquared = originMidPoint.distanceSquared(testCraft.getHitBox().getMidPoint().toBukkit(origin.getWorld()));
+            if (craftDistanceSquared < nearestCraftDistanceSquared) {
+                nearestCraft = testCraft;
+                nearestCraftDistanceSquared = originMidPoint.distanceSquared(testCraft.getHitBox().getMidPoint().toBukkit(origin.getWorld()));
+            }
+        }
+        return nearestCraft;
     }
 }

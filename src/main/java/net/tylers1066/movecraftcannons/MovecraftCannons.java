@@ -6,6 +6,7 @@ import at.pavlov.cannons.Enum.BreakCause;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.cannon.CannonDesign;
 import at.pavlov.cannons.cannon.CannonManager;
+import at.pavlov.cannons.projectile.Projectile;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.MovecraftCombat;
 import net.countercraft.movecraft.craft.Craft;
@@ -19,11 +20,12 @@ import net.tylers1066.movecraftcannons.aiming.AimingListener;
 import net.tylers1066.movecraftcannons.firing.FireCommand;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.firing.FireSign;
+import net.tylers1066.movecraftcannons.homingprojectiles.HomingProjectileManager;
+import net.tylers1066.movecraftcannons.homingprojectiles.LockOnCommand;
 import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.scoreboard.WeaponsScoreboard;
 import net.tylers1066.movecraftcannons.type.MaxCannonsProperty;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -147,6 +149,30 @@ public final class MovecraftCannons extends JavaPlugin {
                 getLogger().info("Loaded absolute max allowed cannons for " + craftName);
             }
 
+            // Load homing projectile types
+            for (String projectileName: getConfig().getStringList("HomingProjectiles")) {
+                Projectile projectile = Cannons.getPlugin().getProjectileStorage().getByName(projectileName);
+                if (projectile == null) {
+                    getLogger().severe(projectileName + " is not a valid Cannons projectile!");
+                    continue;
+                }
+                Config.HomingProjectiles.add(projectile);
+            }
+
+            Config.CountermeasureRange = getConfig().getDouble("CountermeasureRange");
+            getLogger().info("Set countermeasure range to " + Config.CountermeasureRange);
+
+            // Load countermeasure projectile types
+            for (String projectileName: getConfig().getStringList("CountermeasureProjectiles")) {
+                Projectile projectile = Cannons.getPlugin().getProjectileStorage().getByName(projectileName);
+                if (projectile == null) {
+                    getLogger().severe(projectileName + " is not a valid Cannons projectile!");
+                    continue;
+                }
+                Config.CountermeasureProjectiles.add(projectile);
+                getLogger().info(projectileName + " registered as a countermeasure projectile");
+            }
+
             getServer().getPluginManager().registerEvents(new DetectionListener(), this);
             getServer().getPluginManager().registerEvents(new TranslationListener(), this);
             getServer().getPluginManager().registerEvents(new RotationListener(), this);
@@ -155,6 +181,7 @@ public final class MovecraftCannons extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new ClockListener(), this);
             getServer().getPluginManager().registerEvents(new FireSign(), this);
             getServer().getPluginManager().registerEvents(new WeaponsScoreboard(), this);
+            getServer().getPluginManager().registerEvents(new HomingProjectileManager(), this);
 
             ConfigurationSection materialDeflectionSection = getConfig().getConfigurationSection("MaterialDeflectionFactors");
             if (materialDeflectionSection == null) {
@@ -194,6 +221,7 @@ public final class MovecraftCannons extends JavaPlugin {
 
             this.getCommand("aim").setExecutor(new AimingCommand());
             this.getCommand("fire").setExecutor(new FireCommand());
+            this.getCommand("lockon").setExecutor(new LockOnCommand());
         }
     }
 
