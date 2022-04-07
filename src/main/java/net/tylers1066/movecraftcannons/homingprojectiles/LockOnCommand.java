@@ -4,11 +4,12 @@ import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.Resident;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.craft.PilotedCraft;
 import net.countercraft.movecraft.craft.PlayerCraft;
+import net.countercraft.movecraft.craft.SinkingCraft;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -23,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LockOnCommand implements TabExecutor {
@@ -56,11 +56,24 @@ public class LockOnCommand implements TabExecutor {
                 sender.sendMessage(Component.text("There are no crafts nearby to target lock.", NamedTextColor.RED));
                 return true;
             }
+
             lockonCraft = MovecraftUtils.getNearestCraftToCraft(craft, craft.getContacts());
+            if (lockonCraft instanceof SinkingCraft) {
+                sender.sendMessage(Component.text("There are no crafts nearby to target lock.", NamedTextColor.RED));
+                return true;
+            }
+
             if (lockonCraft instanceof PlayerCraft playerCraft && MovecraftUtils.isFriendly(resident, playerCraft)) {
                 sender.sendMessage(Component.text("The closest craft is friendly! Cannot target lock.", NamedTextColor.RED));
                 return true;
             }
+        }
+
+        else if (args[0].equalsIgnoreCase("off")) {
+            sender.sendMessage(Component.text("You are no longer locked on to a craft.", TextColor.color(0xc3f09e)));
+            sender.playSound(Sound.sound(Key.key("radar_lock_acquired"), Sound.Source.MASTER, 3f, 1f), Sound.Emitter.self());
+            HomingProjectileManager.getPlayerHomingTargetMap().remove(player.getUniqueId());
+            return true;
         }
 
         else {
@@ -71,7 +84,7 @@ public class LockOnCommand implements TabExecutor {
             }
 
             lockonCraft = CraftManager.getInstance().getCraftByPlayer(lockonPlayer);
-            if (lockonCraft == null || !craft.getContacts().contains(lockonCraft)) {
+            if (lockonCraft == null || !craft.getContacts().contains(lockonCraft) || lockonCraft instanceof SinkingCraft) {
                 sender.sendMessage(Component.text("Invalid lock-on target.", NamedTextColor.RED));
                 return true;
             }
@@ -79,11 +92,18 @@ public class LockOnCommand implements TabExecutor {
 
         HomingProjectileManager.getPlayerHomingTargetMap().put(player.getUniqueId(), lockonCraft);
 
-        sender.sendMessage(Component.text("Target lock acquired.", TextColor.color(0xc3f09e), TextDecoration.BOLD));
-        sender.playSound(Sound.sound(Key.key("radar_lock_acquired"), Sound.Source.MASTER, 3f, 1f), Sound.Emitter.self());
+        TextComponent.Builder message = Component.text().content("Target lock acquired.");
         if (lockonPlayer != null) {
             lockonPlayer.playSound(Sound.sound(Key.key("radar_lock_warning"), Sound.Source.MASTER, 3f, 1f), Sound.Emitter.self());
+            lockonPlayer.sendMessage(Component.text("You are being target-locked!", TextColor.color(0xd12634), TextDecoration.BOLD));
+            message.append(Component.text(" Target: " + lockonPlayer.getName()));
         }
+
+        message.decorate(TextDecoration.BOLD);
+        message.color(TextColor.color(0xc3f09e));
+        sender.sendMessage(message.build());
+        sender.playSound(Sound.sound(Key.key("radar_lock_acquired"), Sound.Source.MASTER, 3f, 1f), Sound.Emitter.self());
+
         return true;
     }
 
@@ -103,15 +123,13 @@ public class LockOnCommand implements TabExecutor {
             return Collections.emptyList();
         }
 
-        Set<Craft> contacts = craft.getContacts();
-        if (contacts.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return contacts.stream()
+        List<String> tabCompletions = craft.getContacts().stream()
                 .filter(contact -> contact instanceof PlayerCraft)
                 .filter(contact -> !MovecraftUtils.isFriendly(resident, (PlayerCraft) contact))
                 .map(contact -> ((PlayerCraft) contact).getPilot().getName())
                 .collect(Collectors.toList());
+        tabCompletions.add("off");
+
+        return tabCompletions;
     }
 }

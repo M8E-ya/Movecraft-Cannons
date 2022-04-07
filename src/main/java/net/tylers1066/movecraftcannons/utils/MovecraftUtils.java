@@ -94,6 +94,10 @@ public class MovecraftUtils {
         return craft.getHitBox().getMidPoint().toBukkit(craft.getWorld());
     }
 
+    public static Location getRandomBlockOnHitBox(Craft craft) {
+        return craft.getHitBox().asSet().iterator().next().toBukkit(craft.getWorld());
+    }
+
     @Nullable
     public static Craft getNearestCraftToCraft(Craft origin, Set<Craft> crafts) {
         Location originMidPoint = origin.getHitBox().getMidPoint().toBukkit(origin.getWorld());
