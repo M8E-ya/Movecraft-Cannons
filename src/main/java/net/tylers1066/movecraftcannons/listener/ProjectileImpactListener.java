@@ -18,13 +18,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import java.util.Set;
 import java.util.UUID;
 
 public class ProjectileImpactListener implements Listener {
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void impactListener(ProjectileImpactEvent e) {
         if (!Config.EnableCannonsTracking)
             return;
