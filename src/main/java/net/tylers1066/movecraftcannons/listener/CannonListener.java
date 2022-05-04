@@ -24,8 +24,8 @@ import org.bukkit.event.Listener;
 import java.util.*;
 
 public class CannonListener implements Listener {
-    private final static BlockFace[] ADJACENT = { BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
-
+    private final BlockFace[] ADJACENT_BLOCKFACES = { BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
+    private final EnumSet<Material> BARREL_MATERIALS = EnumSet.of(Material.STONE_BRICK_WALL, Material.END_ROD, Material.CHAIN);
 
     @EventHandler
     public void beforeCannonCreate(CannonBeforeCreateEvent event) {
@@ -76,7 +76,7 @@ public class CannonListener implements Listener {
         List<Location> cannonLocations = cannon.getCannonDesign().getAllCannonBlocks(cannon);
         Block muzzle = cannon.getMuzzle().getBlock();
 
-        for (BlockFace face: ADJACENT) {
+        for (BlockFace face: ADJACENT_BLOCKFACES) {
             if (!event.isCancelled()) {
                 Block adjacentBlock = muzzle.getRelative(face);
                 checkIfBlockCoveredAndNext(event, adjacentBlock, face, cannonLocations);
@@ -85,7 +85,7 @@ public class CannonListener implements Listener {
     }
 
     private void checkIfBlockCoveredAndNext(CannonFireEvent event, Block block, BlockFace originatingFace, List<Location> cannonLocations) {
-        if (!cannonLocations.contains(block.getLocation()) || block.getType() != Material.STONE_BRICK_WALL) {
+        if (!cannonLocations.contains(block.getLocation()) || !BARREL_MATERIALS.contains(block.getType())) {
             return;
         }
 
@@ -96,7 +96,7 @@ public class CannonListener implements Listener {
             return;
         }
 
-        for (BlockFace face: ADJACENT) {
+        for (BlockFace face: ADJACENT_BLOCKFACES) {
             if (face == originatingFace.getOppositeFace()) {
                 continue;
             }
@@ -106,7 +106,7 @@ public class CannonListener implements Listener {
 
     private boolean isBlockCovered(Block block, BlockFace originatingFace) {
         int covered = 0;
-        for (BlockFace face : ADJACENT) {
+        for (BlockFace face : ADJACENT_BLOCKFACES) {
             if (face == originatingFace) {
                 continue;
             }
