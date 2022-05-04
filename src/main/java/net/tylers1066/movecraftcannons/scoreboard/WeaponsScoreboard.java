@@ -2,12 +2,11 @@ package net.tylers1066.movecraftcannons.scoreboard;
 
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
-import me.neznamy.tab.api.TabAPI;
-import me.neznamy.tab.api.TabPlayer;
-import me.neznamy.tab.api.scoreboard.ScoreboardManager;
-import net.countercraft.movecraft.craft.*;
+import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.PilotedCraft;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.events.CraftDetectEvent;
-import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
 import net.kyori.adventure.text.Component;
@@ -30,18 +29,18 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.UUID;
 
 public class WeaponsScoreboard implements Listener {
-    private final HashMap<UUID, Boolean> weaponScoreboardPlayers = new HashMap<>();
-    private final ScoreboardManager tabScoreboardManager;
+    private final HashSet<UUID> weaponScoreboardPlayers = new HashSet<>();
 
     public WeaponsScoreboard() {
-        tabScoreboardManager = TabAPI.getInstance().getScoreboardManager();
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (UUID uuid: weaponScoreboardPlayers.keySet()) {
+                for (UUID uuid: weaponScoreboardPlayers) {
                     Player player = Bukkit.getPlayer(uuid);
                     if (player == null)
                         continue;
@@ -128,13 +127,7 @@ public class WeaponsScoreboard implements Listener {
             num++;
         }
 
-        TabPlayer tabPlayer = TabAPI.getInstance().getPlayer(pilot.getUniqueId());
-        boolean hasTabScoreboard = tabScoreboardManager.hasScoreboardVisible(tabPlayer);
-        if (hasTabScoreboard) {
-            tabScoreboardManager.setScoreboardVisible(TabAPI.getInstance().getPlayer(pilot.getUniqueId()), false, false);
-        }
-
-        weaponScoreboardPlayers.put(pilot.getUniqueId(), hasTabScoreboard);
+        weaponScoreboardPlayers.add(pilot.getUniqueId());
         pilot.setScoreboard(board);
     }
 
@@ -176,10 +169,6 @@ public class WeaponsScoreboard implements Listener {
         }
 
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-        if (weaponScoreboardPlayers.getOrDefault(player.getUniqueId(), false)) {
-            tabScoreboardManager.setScoreboardVisible(TabAPI.getInstance().getPlayer(player.getUniqueId()), true, false);
-        }
-
         weaponScoreboardPlayers.remove(player.getUniqueId());
     }
 

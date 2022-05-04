@@ -1,8 +1,8 @@
 name: Movecraft-Cannons
 version: ${project.version}
 main: net.tylers1066.movecraftcannons.MovecraftCannons
-api-version: 1.14
-depend: [Movecraft, Cannons, SquadronsReloaded, Towny, TAB]
+api-version: 1.18
+depend: [Movecraft, Cannons, SquadronsReloaded, Towny]
 softdepend: [Movecraft-Combat]
 authors: [TylerS1066]
 description: Integration between Movecraft and Cannons
