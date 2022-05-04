@@ -32,7 +32,7 @@ import org.bukkit.scoreboard.Team;
 import java.util.*;
 
 public class WeaponsScoreboard implements Listener {
-    private final HashMap<UUID, Boolean> weaponScoreboardMap = new HashMap<>();
+    private final HashSet<UUID> weaponScoreboardPlayers = new HashSet<>();
     private final ScoreboardManager tabScoreboardManager;
 
     public WeaponsScoreboard() {
@@ -40,7 +40,7 @@ public class WeaponsScoreboard implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (UUID uuid: weaponScoreboardMap.keySet()) {
+                for (UUID uuid: weaponScoreboardPlayers) {
                     Player player = Bukkit.getPlayer(uuid);
                     if (player == null)
                         continue;
@@ -131,12 +131,11 @@ public class WeaponsScoreboard implements Listener {
         }
 
         TabPlayer tabPlayer = TabAPI.getInstance().getPlayer(pilot.getUniqueId());
-        boolean hasTabScoreboard = tabScoreboardManager.hasCustomScoreboard(tabPlayer);
-        weaponScoreboardMap.put(pilot.getUniqueId(), hasTabScoreboard);
-        if (hasTabScoreboard) {
+        if (tabScoreboardManager.hasCustomScoreboard(tabPlayer)) {
             tabScoreboardManager.toggleScoreboard(TabAPI.getInstance().getPlayer(pilot.getUniqueId()), false);
         }
 
+        weaponScoreboardPlayers.add(pilot.getUniqueId());
         pilot.setScoreboard(board);
     }
 
@@ -176,8 +175,6 @@ public class WeaponsScoreboard implements Listener {
         if (board.getObjective("CraftHUD") != null) {
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         }
-        weaponScoreboardMap.remove(player.getUniqueId());
-        tabScoreboardManager.toggleScoreboard(TabAPI.getInstance().getPlayer(player.getUniqueId()), weaponScoreboardMap.get(player.getUniqueId()));
     }
 
     private Component createCannonLine(Cannon cannon) {
@@ -194,6 +191,10 @@ public class WeaponsScoreboard implements Listener {
 
     private Component createHullIntegrityLine(Craft craft) {
         int percentage = (int) (((double) craft.getTotalNonNegligibleBlocks() / (double) craft.getOrigBlockCount()) * 100);
+        if (percentage == 0) {
+            // The hull integrity would otherwise momentarily be 0% after the craft is piloted.
+            percentage = 100;
+        }
 
         var line = Component.text()
                 .append(Component.text("Hull Integrity: ", NamedTextColor.WHITE, TextDecoration.BOLD))
