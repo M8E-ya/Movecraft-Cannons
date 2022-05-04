@@ -61,8 +61,8 @@ public class WeaponsScoreboard implements Listener {
         }
     }
 
-    @EventHandler
-    public void onCraftRelease(CraftSinkEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCraftSink(CraftSinkEvent event) {
         Craft craft = event.getCraft();
         if (!(craft instanceof PlayerCraft pcraft)) {
             return;
@@ -80,14 +80,14 @@ public class WeaponsScoreboard implements Listener {
                 continue;
             }
 
-            Team team = pcraft.getPilot().getScoreboard().getTeam(cannon.getUID().toString());
+            Team team = pcraft.getPilot().getScoreboard().getTeam(cannon.getUID().toString().substring(0, 15));
             if (team != null) {
-                team.prefix(Component.text(cannon.getCannonDesign().getMessageName(), NamedTextColor.DARK_RED));
+                team.prefix(Component.text(cannon.getCannonDesign().getMessageName(), NamedTextColor.DARK_RED, TextDecoration.STRIKETHROUGH));
             }
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCraftRelease(CraftReleaseEvent event) {
         Craft craft = event.getCraft();
         if (!(craft instanceof PlayerCraft pcraft)) {
@@ -98,7 +98,11 @@ public class WeaponsScoreboard implements Listener {
     }
 
     public void createWeaponsScoreboard(PilotedCraft craft, LinkedHashSet<Cannon> cannons) {
-        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
+        Scoreboard board = craft.getPilot().getScoreboard();
+        if (board.getObjective("CraftHUD") != null) {
+            return;
+        }
+
         Objective obj = board.registerNewObjective("CraftHUD", "dummy", createHullIntegrityLine(craft));
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
