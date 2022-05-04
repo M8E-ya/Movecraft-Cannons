@@ -131,7 +131,7 @@ public class WeaponsScoreboard implements Listener {
         }
 
         TabPlayer tabPlayer = TabAPI.getInstance().getPlayer(pilot.getUniqueId());
-        boolean hasTabScoreboard = tabScoreboardManager.hasCustomScoreboard(tabPlayer);
+        boolean hasTabScoreboard = tabScoreboardManager.hasScoreboardVisible(tabPlayer);
         if (hasTabScoreboard) {
             tabScoreboardManager.setScoreboardVisible(TabAPI.getInstance().getPlayer(pilot.getUniqueId()), false, false);
         }
@@ -173,13 +173,17 @@ public class WeaponsScoreboard implements Listener {
 
     public void removeWeaponsScoreboard(Player player) {
         Scoreboard board = player.getScoreboard();
-        if (board.getObjective("CraftHUD") != null) {
-            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-            // Restore TAB scoreboard if the player had it before
-            if (weaponScoreboardPlayers.getOrDefault(player.getUniqueId(), false)) {
-                tabScoreboardManager.setScoreboardVisible(TabAPI.getInstance().getPlayer(player.getUniqueId()), true, false);
-            }
+        if (board.getObjective("CraftHUD") == null) {
+            return;
         }
+
+        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+        if (weaponScoreboardPlayers.getOrDefault(player.getUniqueId(), false)) {
+            tabScoreboardManager.resetScoreboard(TabAPI.getInstance().getPlayer(player.getUniqueId()));
+            tabScoreboardManager.setScoreboardVisible(TabAPI.getInstance().getPlayer(player.getUniqueId()), true, false);
+        }
+
+        weaponScoreboardPlayers.remove(player.getUniqueId());
     }
 
     private Component createCannonLine(Cannon cannon) {
