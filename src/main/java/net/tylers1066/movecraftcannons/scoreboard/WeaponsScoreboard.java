@@ -32,7 +32,7 @@ import org.bukkit.scoreboard.Team;
 import java.util.*;
 
 public class WeaponsScoreboard implements Listener {
-    private final HashSet<UUID> weaponScoreboardPlayers = new HashSet<>();
+    private final HashMap<UUID, Boolean> weaponScoreboardPlayers = new HashMap<>();
     private final ScoreboardManager tabScoreboardManager;
 
     public WeaponsScoreboard() {
@@ -40,7 +40,7 @@ public class WeaponsScoreboard implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (UUID uuid: weaponScoreboardPlayers) {
+                for (UUID uuid: weaponScoreboardPlayers.keySet()) {
                     Player player = Bukkit.getPlayer(uuid);
                     if (player == null)
                         continue;
@@ -131,11 +131,12 @@ public class WeaponsScoreboard implements Listener {
         }
 
         TabPlayer tabPlayer = TabAPI.getInstance().getPlayer(pilot.getUniqueId());
-        if (tabScoreboardManager.hasCustomScoreboard(tabPlayer)) {
-            tabScoreboardManager.toggleScoreboard(TabAPI.getInstance().getPlayer(pilot.getUniqueId()), false);
+        boolean hasTabScoreboard = tabScoreboardManager.hasCustomScoreboard(tabPlayer);
+        if (hasTabScoreboard) {
+            tabScoreboardManager.setScoreboardVisible(TabAPI.getInstance().getPlayer(pilot.getUniqueId()), false, false);
         }
 
-        weaponScoreboardPlayers.add(pilot.getUniqueId());
+        weaponScoreboardPlayers.put(pilot.getUniqueId(), hasTabScoreboard);
         pilot.setScoreboard(board);
     }
 
@@ -174,6 +175,10 @@ public class WeaponsScoreboard implements Listener {
         Scoreboard board = player.getScoreboard();
         if (board.getObjective("CraftHUD") != null) {
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
+            // Restore TAB scoreboard if the player had it before
+            if (weaponScoreboardPlayers.getOrDefault(player.getUniqueId(), false)) {
+                tabScoreboardManager.setScoreboardVisible(TabAPI.getInstance().getPlayer(player.getUniqueId()), true, false);
+            }
         }
     }
 
