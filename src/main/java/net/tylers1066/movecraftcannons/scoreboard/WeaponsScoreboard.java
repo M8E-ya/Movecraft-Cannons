@@ -2,6 +2,9 @@ package net.tylers1066.movecraftcannons.scoreboard;
 
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
+import me.neznamy.tab.api.TabAPI;
+import me.neznamy.tab.api.TabPlayer;
+import me.neznamy.tab.api.scoreboard.ScoreboardManager;
 import net.countercraft.movecraft.craft.*;
 import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
@@ -19,25 +22,25 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class WeaponsScoreboard implements Listener {
-    private final Set<UUID> hasWeaponsScoreboard = new HashSet<>();
+    private final HashMap<UUID, Boolean> weaponScoreboardMap = new HashMap<>();
+    private final ScoreboardManager tabScoreboardManager;
 
     public WeaponsScoreboard() {
+        tabScoreboardManager = TabAPI.getInstance().getScoreboardManager();
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (UUID uuid: hasWeaponsScoreboard) {
+                for (UUID uuid: weaponScoreboardMap.keySet()) {
                     Player player = Bukkit.getPlayer(uuid);
                     if (player == null)
                         continue;
@@ -97,8 +100,14 @@ public class WeaponsScoreboard implements Listener {
         removeWeaponsScoreboard(pcraft.getPilot());
     }
 
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        removeWeaponsScoreboard(event.getPlayer());
+    }
+
     public void createWeaponsScoreboard(PilotedCraft craft, LinkedHashSet<Cannon> cannons) {
-        Scoreboard board = craft.getPilot().getScoreboard();
+        Player pilot = craft.getPilot();
+        Scoreboard board = pilot.getScoreboard();
         if (board.getObjective("CraftHUD") != null) {
             return;
         }
@@ -121,8 +130,14 @@ public class WeaponsScoreboard implements Listener {
             num++;
         }
 
-        hasWeaponsScoreboard.add(craft.getPilot().getUniqueId());
-        craft.getPilot().setScoreboard(board);
+        TabPlayer tabPlayer = TabAPI.getInstance().getPlayer(pilot.getUniqueId());
+        boolean hasTabScoreboard = tabScoreboardManager.hasCustomScoreboard(tabPlayer);
+        weaponScoreboardMap.put(pilot.getUniqueId(), hasTabScoreboard);
+        if (hasTabScoreboard) {
+            tabScoreboardManager.toggleScoreboard(TabAPI.getInstance().getPlayer(pilot.getUniqueId()), false);
+        }
+
+        pilot.setScoreboard(board);
     }
 
     public void updateWeaponsScoreboard(Player player) {
@@ -161,7 +176,8 @@ public class WeaponsScoreboard implements Listener {
         if (board.getObjective("CraftHUD") != null) {
             player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         }
-        hasWeaponsScoreboard.remove(player.getUniqueId());
+        weaponScoreboardMap.remove(player.getUniqueId());
+        tabScoreboardManager.toggleScoreboard(TabAPI.getInstance().getPlayer(player.getUniqueId()), weaponScoreboardMap.get(player.getUniqueId()));
     }
 
     private Component createCannonLine(Cannon cannon) {
