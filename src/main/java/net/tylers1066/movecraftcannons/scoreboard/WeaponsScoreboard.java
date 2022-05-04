@@ -6,6 +6,7 @@ import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
 import me.neznamy.tab.api.scoreboard.ScoreboardManager;
 import net.countercraft.movecraft.craft.*;
+import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
@@ -51,8 +52,8 @@ public class WeaponsScoreboard implements Listener {
         }.runTaskTimerAsynchronously(MovecraftCannons.getInstance(), 1L, 2L);
     }
 
-    @EventHandler
-    public void onCraftPilot(CraftPilotEvent event) {
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCraftPilot(CraftDetectEvent event) {
         Craft craft = event.getCraft();
         if (!(craft instanceof PlayerCraft pcraft)) {
             return;
@@ -107,10 +108,7 @@ public class WeaponsScoreboard implements Listener {
 
     public void createWeaponsScoreboard(PilotedCraft craft, LinkedHashSet<Cannon> cannons) {
         Player pilot = craft.getPilot();
-        Scoreboard board = pilot.getScoreboard();
-        if (board.getObjective("CraftHUD") != null) {
-            return;
-        }
+        Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
 
         Objective obj = board.registerNewObjective("CraftHUD", "dummy", createHullIntegrityLine(craft));
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -179,7 +177,6 @@ public class WeaponsScoreboard implements Listener {
 
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         if (weaponScoreboardPlayers.getOrDefault(player.getUniqueId(), false)) {
-            tabScoreboardManager.resetScoreboard(TabAPI.getInstance().getPlayer(player.getUniqueId()));
             tabScoreboardManager.setScoreboardVisible(TabAPI.getInstance().getPlayer(player.getUniqueId()), true, false);
         }
 
