@@ -24,7 +24,7 @@ import org.bukkit.event.Listener;
 import java.util.*;
 
 public class CannonListener implements Listener {
-    private final static BlockFace[] ADJACENT = { BlockFace.DOWN, BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
+    private final static BlockFace[] ADJACENT = { BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
 
 
     @EventHandler
@@ -111,7 +111,7 @@ public class CannonListener implements Listener {
                 continue;
             }
             Block adjacentBlock = block.getRelative(face);
-            if (!adjacentBlock.getType().isAir()) {
+            if (!adjacentBlock.getType().isAir() || !adjacentBlock.getRelative(BlockFace.UP).getType().isAir()) {
                 covered++;
             }
             if (covered > 1) {
