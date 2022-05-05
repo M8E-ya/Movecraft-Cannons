@@ -1,6 +1,9 @@
 package net.tylers1066.movecraftcannons.listener;
 
+import at.pavlov.cannons.API.CannonsAPI;
+import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
+import at.pavlov.cannons.cannon.CannonManager;
 import at.pavlov.cannons.event.CannonAfterCreateEvent;
 import at.pavlov.cannons.event.CannonBeforeCreateEvent;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
@@ -111,7 +114,7 @@ public class CannonListener implements Listener {
                 continue;
             }
             Block adjacentBlock = block.getRelative(face);
-            if (!adjacentBlock.getType().isAir() || !adjacentBlock.getRelative(BlockFace.UP).getType().isAir()) {
+            if (isBlockCovered(adjacentBlock) || isBlockCovered(adjacentBlock.getRelative(BlockFace.UP))) {
                 covered++;
             }
             if (covered > 1) {
@@ -119,6 +122,10 @@ public class CannonListener implements Listener {
             }
         }
         return false;
+    }
+
+    private boolean isBlockCovered(Block block) {
+        return !block.getType().isAir() && !BARREL_MATERIALS.contains(block.getType());
     }
 
     private void sendMessageToCannonOperator(Cannon cannon, UUID operator, Component message) {
