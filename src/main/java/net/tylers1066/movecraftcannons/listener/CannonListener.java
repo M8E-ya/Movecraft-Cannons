@@ -28,7 +28,7 @@ import java.util.*;
 
 public class CannonListener implements Listener {
     private final BlockFace[] ADJACENT_BLOCKFACES = { BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
-    private final EnumSet<Material> BARREL_MATERIALS = EnumSet.of(Material.STONE_BRICK_WALL, Material.END_ROD, Material.CHAIN);
+    private final EnumSet<Material> BARREL_MATERIALS = EnumSet.of(Material.STONE_BRICK_WALL, Material.CHAIN);
 
     @EventHandler
     public void beforeCannonCreate(CannonBeforeCreateEvent event) {
