@@ -114,9 +114,11 @@ public class CannonListener implements Listener {
                 continue;
             }
             Block adjacentBlock = block.getRelative(face);
-            if (isBlockCovered(adjacentBlock) || isBlockCovered(adjacentBlock.getRelative(BlockFace.UP))) {
+            Block aboveBlock = adjacentBlock.getRelative(BlockFace.UP);
+            if (isBlockCovered(adjacentBlock) || isBlockCovered(aboveBlock) || isBlockCovered(aboveBlock.getRelative(BlockFace.UP))) {
                 covered++;
             }
+
             if (covered > 1) {
                 return true;
             }
