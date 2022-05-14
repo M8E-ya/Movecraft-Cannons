@@ -82,17 +82,18 @@ public class CannonListener implements Listener {
         for (BlockFace face: ADJACENT_BLOCKFACES) {
             if (!event.isCancelled()) {
                 Block adjacentBlock = muzzle.getRelative(face);
-                checkIfBlockCoveredAndNext(event, adjacentBlock, face, cannonLocations);
+                checkIfBlockCoveredAndNext(event, adjacentBlock, face, cannonLocations, event.getPlayer());
             }
         }
     }
 
-    private void checkIfBlockCoveredAndNext(CannonFireEvent event, Block block, BlockFace originatingFace, List<Location> cannonLocations) {
+    private void checkIfBlockCoveredAndNext(CannonFireEvent event, Block block, BlockFace originatingFace,
+                                            List<Location> cannonLocations, UUID player) {
         if (!cannonLocations.contains(block.getLocation()) || !BARREL_MATERIALS.contains(block.getType())) {
             return;
         }
 
-        if (isBlockCovered(block, originatingFace.getOppositeFace())) {
+        if (isBlockCovered(block, originatingFace.getOppositeFace(), player)) {
             sendMessageToCannonOperator(event.getCannon(), event.getPlayer(),
                     Component.text("One of your cannon's barrel blocks is covered. Make some space for it!", NamedTextColor.RED));
             event.setCancelled(true);
@@ -103,11 +104,11 @@ public class CannonListener implements Listener {
             if (face == originatingFace.getOppositeFace()) {
                 continue;
             }
-            checkIfBlockCoveredAndNext(event, block.getRelative(face), face, cannonLocations);
+            checkIfBlockCoveredAndNext(event, block.getRelative(face), face, cannonLocations, player);
         }
     }
 
-    private boolean isBlockCovered(Block block, BlockFace originatingFace) {
+    private boolean isBlockCovered(Block block, BlockFace originatingFace, UUID player) {
         int covered = 0;
         for (BlockFace face : ADJACENT_BLOCKFACES) {
             if (face == originatingFace) {
@@ -115,7 +116,9 @@ public class CannonListener implements Listener {
             }
             Block adjacentBlock = block.getRelative(face);
             Block aboveBlock = adjacentBlock.getRelative(BlockFace.UP);
-            if (isBlockCovered(adjacentBlock) || isBlockCovered(aboveBlock) || isBlockCovered(aboveBlock.getRelative(BlockFace.UP))) {
+            if (isBlockCovered(adjacentBlock, player)
+                    || isBlockCovered(aboveBlock, player)
+                    || isBlockCovered(aboveBlock.getRelative(BlockFace.UP), player)) {
                 covered++;
             }
 
@@ -126,8 +129,8 @@ public class CannonListener implements Listener {
         return false;
     }
 
-    private boolean isBlockCovered(Block block) {
-        return !block.getType().isAir() && !BARREL_MATERIALS.contains(block.getType());
+    private boolean isBlockCovered(Block block, UUID player) {
+        return !block.getType().isAir() && Cannons.getPlugin().getCannonManager().getCannon(block.getLocation(), player) == null;
     }
 
     private void sendMessageToCannonOperator(Cannon cannon, UUID operator, Component message) {
