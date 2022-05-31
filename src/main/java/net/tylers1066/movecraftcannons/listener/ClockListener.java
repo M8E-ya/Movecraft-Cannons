@@ -1,6 +1,7 @@
 package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.Cannons;
+import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import me.halfquark.squadronsreloaded.squadron.Squadron;
 import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
 import me.halfquark.squadronsreloaded.squadron.SquadronManager;
@@ -19,11 +20,16 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 public class ClockListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onInteract(PlayerInteractEvent event) {
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+            return;
+        }
+
         ItemStack item = event.getItem();
         if (item == null || item.getType() != Material.CLOCK) {
             return;
@@ -36,6 +42,64 @@ public class ClockListener implements Listener {
         }
 
         // Check if the clock specifies a cannon type to manage
+        String selectedCannonType = getSelectedCannonTypeFromItem(item);
+
+        // Right-click - aim
+        AimingUtils.aimCannonsOnCraft(craft, player, selectedCannonType);
+
+        // Aerial crafts will also fire, as well as aim
+        if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
+            var cannons = DetectionListener.getCannonsOnCraft(craft);
+            FiringUtils.fireCannons(player, cannons, true);
+        }
+
+        if (SquadronManager.getInstance().hasSquadron(player)) {
+            Squadron squad = SquadronManager.getInstance().getPlayerSquadron(player, true);
+            if (squad == null)
+                return;
+            for (SquadronCraft squadCraft: squad.getCrafts()) {
+                var squadCraftCannons = DetectionListener.getCannonsOnCraft(squadCraft);
+                FiringUtils.fireCannons(player, squadCraftCannons, true);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerArmSwing(PlayerArmSwingEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = player.getInventory().getItem(event.getHand());
+        if (item.getType() != Material.CLOCK) {
+            return;
+        }
+
+        Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
+        if (craft == null) {
+            return;
+        }
+
+        // Aerial crafts only fire on right-click
+        if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
+            return;
+        }
+
+        var cannons = DetectionListener.getCannonsOnCraft(craft);
+        if (cannons.isEmpty()) {
+            return;
+        }
+
+        // Check if the clock specifies a cannon type to manage
+        String selectedCannonType = getSelectedCannonTypeFromItem(item);
+        // Filter non-selected cannons
+        if (selectedCannonType != null) {
+            cannons.removeIf(cannon -> !cannon.getCannonDesign().getDesignName().equals(selectedCannonType));
+        }
+
+        FiringUtils.fireCannons(player, cannons, true);
+    }
+
+
+    @Nullable
+    private String getSelectedCannonTypeFromItem(ItemStack item) {
         String selectedCannonType = null;
         if (item.hasItemMeta()) {
             ItemMeta meta = item.getItemMeta();
@@ -49,49 +113,6 @@ public class ClockListener implements Listener {
                 }
             }
         }
-
-        // Left-click - fire
-        if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            // Aerial crafts only fire on right-click
-            if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
-                return;
-            }
-
-            var cannons = DetectionListener.getCannonsOnCraft(craft);
-            if (cannons.isEmpty()) {
-                return;
-            }
-
-            // Filter non-selected cannons
-            if (selectedCannonType != null) {
-                String finalSelectedCannonType = selectedCannonType;
-                cannons.removeIf(cannon -> !cannon.getCannonDesign().getDesignName().equals(finalSelectedCannonType));
-            }
-
-            FiringUtils.fireCannons(player, cannons, true);
-        }
-
-        // Right-click - aim
-        else if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            AimingUtils.aimCannonsOnCraft(craft, player, selectedCannonType);
-
-            // Aerial crafts will also fire, as well as aim
-            if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
-                var cannons = DetectionListener.getCannonsOnCraft(craft);
-                FiringUtils.fireCannons(player, cannons, true);
-            }
-
-            if (SquadronManager.getInstance().hasSquadron(player)) {
-                Squadron squad = SquadronManager.getInstance().getPlayerSquadron(player, true);
-                if (squad == null)
-                    return;
-                for (SquadronCraft squadCraft: squad.getCrafts()) {
-                    var squadCraftCannons = DetectionListener.getCannonsOnCraft(squadCraft);
-                    FiringUtils.fireCannons(player, squadCraftCannons, true);
-                }
-            }
-        }
+        return selectedCannonType;
     }
-
-
 }
