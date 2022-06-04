@@ -156,7 +156,7 @@ public final class MovecraftCannons extends JavaPlugin {
                     getLogger().severe(projectileName + " is not a valid Cannons projectile!");
                     continue;
                 }
-                Config.HomingProjectiles.add(projectile);
+                Config.HomingProjectiles.add(projectileName);
             }
 
             Config.CountermeasureRange = getConfig().getDouble("CountermeasureRange");
@@ -169,7 +169,7 @@ public final class MovecraftCannons extends JavaPlugin {
                     getLogger().severe(projectileName + " is not a valid Cannons projectile!");
                     continue;
                 }
-                Config.CountermeasureProjectiles.add(projectile);
+                Config.CountermeasureProjectiles.add(projectileName);
                 getLogger().info(projectileName + " registered as a countermeasure projectile");
             }
 

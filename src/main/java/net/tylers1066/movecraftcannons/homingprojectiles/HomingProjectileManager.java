@@ -36,7 +36,7 @@ public class HomingProjectileManager implements Listener {
             @Override
             public void run() {
                 for (FlyingProjectile flyingProjectile: Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
-                    if (!Config.HomingProjectiles.contains(flyingProjectile.getProjectile())) {
+                    if (!Config.HomingProjectiles.contains(flyingProjectile.getProjectile().getProjectileId())) {
                         continue;
                     }
 
@@ -58,7 +58,7 @@ public class HomingProjectileManager implements Listener {
                         Projectile projectileEntity = flyingProjectile.getProjectileEntity();
                         for (FlyingProjectile otherProjectile : Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
                             if (otherProjectile != flyingProjectile
-                                    && Config.CountermeasureProjectiles.contains(otherProjectile.getProjectile())
+                                    && Config.CountermeasureProjectiles.contains(otherProjectile.getProjectile().getProjectileId())
                                     && !otherProjectile.getShooterUID().equals(flyingProjectile.getShooterUID())
                                     && projectileEntity.getLocation().distanceSquared(otherProjectile.getProjectileEntity().getLocation()) <= Math.pow(Config.CountermeasureRange, 2)) {
                                 targetLocation = otherProjectile.getProjectileEntity().getLocation();

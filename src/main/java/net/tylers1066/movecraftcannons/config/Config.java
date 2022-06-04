@@ -26,8 +26,8 @@ public class Config {
     public static final Map<String, List<MaxCannonEntry>> CraftMaxAllowedCannons = new HashMap<>();
 
     // Projectiles
-    public static final Set<Projectile> HomingProjectiles = new HashSet<>();
-    public static final Set<Projectile> CountermeasureProjectiles = new HashSet<>();
+    public static final Set<String> HomingProjectiles = new HashSet<>();
+    public static final Set<String> CountermeasureProjectiles = new HashSet<>();
     public static double CountermeasureRange = 0;
     public static final Multimap<String, String> ProjectilesOnlyDamageCrafts = MultimapBuilder.hashKeys().hashSetValues().build();
 
