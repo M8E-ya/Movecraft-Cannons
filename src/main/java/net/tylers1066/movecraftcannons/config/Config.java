@@ -1,8 +1,12 @@
 package net.tylers1066.movecraftcannons.config;
 
 import at.pavlov.cannons.projectile.Projectile;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.type.CraftType;
+import org.openjdk.jmh.util.HashMultimap;
+import org.openjdk.jmh.util.HashsetMultimap;
 
 import java.util.*;
 
@@ -25,6 +29,8 @@ public class Config {
     public static final Set<Projectile> HomingProjectiles = new HashSet<>();
     public static final Set<Projectile> CountermeasureProjectiles = new HashSet<>();
     public static double CountermeasureRange = 0;
+    public static final Multimap<String, String> ProjectilesOnlyDamageCrafts = MultimapBuilder.hashKeys().hashSetValues().build();
+
 
     public static int getMaxAllowedCannonOnCraft(Craft craft, String cannonType) {
         String craftName = craft.getType().getStringProperty(CraftType.NAME);

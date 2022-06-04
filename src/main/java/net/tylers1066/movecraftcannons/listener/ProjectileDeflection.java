@@ -34,7 +34,7 @@ public class ProjectileDeflection implements Listener {
 
         // Only apply ricochet mechanics to piloted crafts
         /*
-        if (MovecraftUtils.getPlayerCraftsAtLocation(impactLoc).isEmpty()) {
+        if (MovecraftUtils.getPlayerCraftsAtLocation(impactLoc, 1D).isEmpty()) {
             return;
         }
          */

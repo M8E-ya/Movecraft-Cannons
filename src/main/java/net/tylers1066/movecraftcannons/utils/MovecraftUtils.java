@@ -62,10 +62,10 @@ public class MovecraftUtils {
     }
 
     @NotNull
-    public static Set<Craft> getPlayerCraftsAtLocation(Location location) {
+    public static Set<Craft> getPlayerCraftsAtLocation(Location location, double radius) {
         Set<Craft> crafts = new HashSet<>();
         for (Craft craft: CraftManager.getInstance().getPlayerCraftsInWorld(location.getWorld())) {
-            if (MathUtils.locationNearHitBox(craft.getHitBox(), location, 1D)) {
+            if (MathUtils.locationNearHitBox(craft.getHitBox(), location, radius)) {
                 crafts.add(craft);
             }
         }

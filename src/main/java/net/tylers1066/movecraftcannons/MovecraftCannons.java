@@ -217,6 +217,29 @@ public final class MovecraftCannons extends JavaPlugin {
                 }
             }
 
+            ConfigurationSection projectileCraftDamageSection = getConfig().getConfigurationSection("ProjectileOnlyDamageCrafts");
+            if (projectileCraftDamageSection == null) {
+                getLogger().severe("Config is missing ProjectileOnlyDamageCrafts section!");
+            }
+            else {
+                for (String projectileName : projectileCraftDamageSection.getKeys(false)) {
+                    if (Cannons.getPlugin().getProjectileStorage().getByName(projectileName) == null) {
+                        getLogger().severe(projectileName + " is not a valid projectile!");
+                        continue;
+                    }
+
+                    List<String> craftNames = projectileCraftDamageSection.getStringList(projectileName);
+                    for (String craftName : craftNames) {
+                        if (CraftManager.getInstance().getCraftTypeFromString(craftName) == null) {
+                            getLogger().severe(craftName + " is not a valid craft type!");
+                            continue;
+                        }
+                        Config.ProjectilesOnlyDamageCrafts.put(projectileName, craftName);
+                        getLogger().info(craftName + " added to the list of craft types that " + projectileName + " can damage");
+                    }
+                }
+            }
+
             getServer().getPluginManager().registerEvents(new ProjectileDeflection(), this);
 
             this.getCommand("aim").setExecutor(new AimingCommand());

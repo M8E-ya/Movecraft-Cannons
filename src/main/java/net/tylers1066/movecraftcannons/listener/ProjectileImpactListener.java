@@ -2,6 +2,7 @@ package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.event.ProjectileImpactEvent;
+import at.pavlov.cannons.projectile.Projectile;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.features.tracking.DamageRecord;
 import net.countercraft.movecraft.combat.features.tracking.events.CraftDamagedByEvent;
@@ -9,6 +10,7 @@ import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.craft.SubCraftImpl;
+import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
@@ -21,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -68,7 +71,7 @@ public class ProjectileImpactListener implements Listener {
         }
 
         if (MathUtils.locationNearHitBox(originCraft.getHitBox(), impactLocation, 1.0)) {
-            Set<Craft> craftsAtImpactLocation = MovecraftUtils.getPlayerCraftsAtLocation(impactLocation);
+            Set<Craft> craftsAtImpactLocation = MovecraftUtils.getPlayerCraftsAtLocation(impactLocation, 1D);
             craftsAtImpactLocation.remove(originCraft);
             if (originCraft instanceof SubCraftImpl subCraft) {
                 craftsAtImpactLocation.remove(subCraft.getParent());
@@ -80,6 +83,24 @@ public class ProjectileImpactListener implements Listener {
             }
 
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void enforceProjectileCraftDamageRestriction(ProjectileImpactEvent event) {
+        String projectileName = event.getProjectile().getProjectileId();
+        Collection<String> allowedToDamageCraftTypes = Config.ProjectilesOnlyDamageCrafts.get(projectileName);
+        if (allowedToDamageCraftTypes.isEmpty()) {
+            return;
+        }
+
+        Set<Craft> craftsAtLocation = MovecraftUtils.getPlayerCraftsAtLocation(event.getImpactLocation(), 1D);
+        for (Craft craft : craftsAtLocation) {
+            String craftTypeName = craft.getType().getStringProperty(CraftType.NAME);
+            if (!allowedToDamageCraftTypes.contains(craftTypeName)) {
+                event.setCancelled(true);
+                return;
+            }
         }
     }
 }

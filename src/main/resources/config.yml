@@ -78,3 +78,8 @@ CountermeasureProjectiles:
   - "Flare"
 
 CountermeasureRange: 100
+
+ProjectileOnlyDamageCrafts:
+  AntiAirAmmo:
+    - "Fighter"
+    - "Bomber"
