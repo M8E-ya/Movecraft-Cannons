@@ -27,7 +27,7 @@ import org.bukkit.event.Listener;
 import java.util.*;
 
 public class CannonListener implements Listener {
-    private final BlockFace[] ADJACENT_BLOCKFACES = { BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH };
+    private final BlockFace[] ADJACENT_BLOCKFACES = { BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.DOWN };
     private final EnumSet<Material> BARREL_MATERIALS = EnumSet.of(Material.STONE_BRICK_WALL, Material.CHAIN);
 
     @EventHandler
