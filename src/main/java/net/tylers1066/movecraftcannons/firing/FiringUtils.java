@@ -30,11 +30,9 @@ public class FiringUtils {
 
         int numCannons = 0;
         for (Cannon cannon: cannons) {
-            if (useFiringVector) {
-                if (AimingUtils.cannonCanFireAtVector(cannon, firingVector)) {
-                    fireCannon(cannon);
-                    numCannons++;
-                }
+            if (useFiringVector && AimingUtils.cannonCanFireAtVector(cannon, firingVector)) {
+                fireCannon(cannon);
+                numCannons++;
             }
             else {
                 fireCannon(cannon);
@@ -63,7 +61,7 @@ public class FiringUtils {
     /**
      * Returns the block that the player is looking at as a vector.
      * <p>
-     * This is specifically the furthest block within the player's server-side view distance
+     * This is specifically the furthest block within the player's client-side view
      * in the player's direction.
      *
      * @param  player the player
@@ -71,8 +69,7 @@ public class FiringUtils {
      */
     @NotNull
     public static Vector getPlayerFiringVector(Player player) {
-        // TODO: use per-player no-tick view distance once it has been re-implemented
-        Location target = player.getTargetBlock(materialSet, player.getViewDistance() * 16).getLocation();
+        Location target = player.getTargetBlock(materialSet, player.getClientViewDistance() * 16).getLocation();
         Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
         // View blocked by own craft: use non-convergent aiming
         if (craft != null && craft.getHitBox().contains(MathUtils.bukkit2MovecraftLoc(target))) {

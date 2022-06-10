@@ -12,6 +12,9 @@ import net.countercraft.movecraft.combat.MovecraftCombat;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.type.CraftType;
+import net.countercraft.movecraft.craft.type.TypeData;
+import net.countercraft.movecraft.craft.type.property.BooleanProperty;
+import net.countercraft.movecraft.craft.type.property.ObjectPropertyImpl;
 import net.countercraft.movecraft.util.MathUtils;
 import net.countercraft.movecraft.util.Tags;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
@@ -25,9 +28,11 @@ import net.tylers1066.movecraftcannons.homingprojectiles.LockOnCommand;
 import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.scoreboard.WeaponsScoreboard;
+import net.tylers1066.movecraftcannons.type.MaxCannonsEntry;
 import net.tylers1066.movecraftcannons.type.MaxCannonsProperty;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.plugin.Plugin;
@@ -50,9 +55,15 @@ public final class MovecraftCannons extends JavaPlugin {
         return instance;
     }
 
+    // CCNet
+    public static final NamespacedKey CAN_USE_CANNONS = new NamespacedKey("movecraft_cannons", "can_use_cannons");
+
     @Override
     public void onLoad() {
         MaxCannonsProperty.register();
+
+        // CCNet
+        CraftType.registerProperty(new BooleanProperty("canUseCannons", CAN_USE_CANNONS, type -> true));
     }
 
     @Override

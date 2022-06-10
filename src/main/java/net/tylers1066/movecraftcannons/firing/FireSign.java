@@ -8,6 +8,7 @@ import net.countercraft.movecraft.craft.PlayerCraft;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
@@ -45,7 +46,10 @@ public class FireSign implements Listener {
 
         Player player = event.getPlayer();
         Craft craft = MovecraftUtils.getCurrentShip(player);
-        if (!(craft instanceof PlayerCraft pcraft) || !(MovecraftUtils.isFriendly(TownyAPI.getInstance().getResident(player), pcraft))) {
+        if (!craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
+            return;
+        }
+        if (!(craft instanceof PlayerCraft pcraft) || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS) ||  !(MovecraftUtils.isFriendly(TownyAPI.getInstance().getResident(player), pcraft))) {
             player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Unfriendly craft"), TextColor.color(0xffb2ab)));
             return;
         }

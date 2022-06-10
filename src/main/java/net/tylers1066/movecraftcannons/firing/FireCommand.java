@@ -10,6 +10,7 @@ import net.countercraft.movecraft.craft.PlayerCraft;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
@@ -42,7 +43,7 @@ public class FireCommand implements TabExecutor {
         }
 
         Set<Cannon> cannonsOnCraft = DetectionListener.getCannonsOnCraft(craft);
-        if (cannonsOnCraft.isEmpty()) {
+        if (cannonsOnCraft.isEmpty() || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
             player.sendMessage(Component.text("There are no cannons on your craft to fire.", NamedTextColor.RED));
             return true;
         }

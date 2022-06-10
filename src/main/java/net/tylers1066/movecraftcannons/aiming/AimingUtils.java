@@ -11,6 +11,7 @@ import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
+import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import org.bukkit.Location;
@@ -30,7 +31,7 @@ public class AimingUtils {
 
     public static void aimCannonsOnCraft(Craft craft, Player player, @Nullable String cannonType) {
         Set<Cannon> cannonList = DetectionListener.cannonsOnCraft.get(craft);
-        if (cannonList == null || cannonList.isEmpty()) {
+        if (cannonList == null || cannonList.isEmpty() || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
             player.sendActionBar(Component.text(I18nSupport.getInternationalisedString("No cannons to aim"), TextColor.color(0xd6524b)));
             return;
         }

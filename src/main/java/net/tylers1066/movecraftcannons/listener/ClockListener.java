@@ -9,6 +9,7 @@ import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.type.CraftType;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.aiming.AimingUtils;
 import net.tylers1066.movecraftcannons.firing.FiringUtils;
 import org.bukkit.Material;
@@ -37,7 +38,7 @@ public class ClockListener implements Listener {
 
         Player player = event.getPlayer();
         Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
-        if (craft == null) {
+        if (craft == null || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
             return;
         }
 
@@ -73,7 +74,7 @@ public class ClockListener implements Listener {
         }
 
         Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
-        if (craft == null) {
+        if (craft == null || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
             return;
         }
 
