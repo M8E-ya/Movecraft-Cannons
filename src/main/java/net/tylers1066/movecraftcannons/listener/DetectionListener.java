@@ -40,7 +40,7 @@ public class DetectionListener implements Listener {
         if (craft instanceof SubCraft subCraft) {
             LinkedHashSet<Cannon> subCraftCannons = new LinkedHashSet<>();
             for (Cannon cannon: getCannonsOnCraft(subCraft.getParent())) {
-                if (MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(cannon.getCannonDesign().getFiringTrigger(cannon)))) {
+                if (MathUtils.locIsNearCraftFast(subCraft, MathUtils.bukkit2MovecraftLoc(cannon.getCannonDesign().getFiringTrigger(cannon)))) {
                     subCraftCannons.add(cannon);
                 }
             }
