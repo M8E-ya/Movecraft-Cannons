@@ -44,7 +44,7 @@ public class DetectionListener implements Listener {
                     subCraftCannons.add(cannon);
                 }
             }
-            if (!cannonsOnCraft.isEmpty()) {
+            if (!subCraftCannons.isEmpty()) {
                 cannonsOnCraft.put(subCraft, subCraftCannons);
             }
             return;
