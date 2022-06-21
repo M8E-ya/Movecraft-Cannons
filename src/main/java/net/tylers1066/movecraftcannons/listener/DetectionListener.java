@@ -2,12 +2,14 @@ package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.cannon.Cannon;
 import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
+import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.craft.*;
 import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
+import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
@@ -34,8 +36,17 @@ public class DetectionListener implements Listener {
         }
 
         UUID uuid;
-        // SubcraftRotate craft cannons are controlled by their parent craft
-        if (craft instanceof SubCraftImpl) {
+        // Subcrafts: only include cannons that are inside the subcraft
+        if (craft instanceof SubCraft subCraft) {
+            LinkedHashSet<Cannon> subCraftCannons = new LinkedHashSet<>();
+            for (Cannon cannon: getCannonsOnCraft(subCraft.getParent())) {
+                if (MathUtils.locIsNearCraftFast(craft, MathUtils.bukkit2MovecraftLoc(cannon.getCannonDesign().getFiringTrigger(cannon)))) {
+                    subCraftCannons.add(cannon);
+                }
+            }
+            if (!cannonsOnCraft.isEmpty()) {
+                cannonsOnCraft.put(subCraft, subCraftCannons);
+            }
             return;
         }
         else if (craft instanceof PilotedCraft pilotedCraft) {
