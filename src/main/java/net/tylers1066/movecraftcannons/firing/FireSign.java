@@ -46,9 +46,6 @@ public class FireSign implements Listener {
 
         Player player = event.getPlayer();
         Craft craft = MovecraftUtils.getCurrentShip(player);
-        if (!craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
-            return;
-        }
         if (!(craft instanceof PlayerCraft pcraft) || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS) ||  !(MovecraftUtils.isFriendly(TownyAPI.getInstance().getResident(player), pcraft))) {
             player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Unfriendly craft"), TextColor.color(0xffb2ab)));
             return;
