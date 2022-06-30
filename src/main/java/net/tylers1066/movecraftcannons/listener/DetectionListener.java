@@ -2,26 +2,24 @@ package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.cannon.Cannon;
 import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
-import net.countercraft.movecraft.MovecraftLocation;
-import net.countercraft.movecraft.craft.*;
+import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.PilotedCraft;
+import net.countercraft.movecraft.craft.SubCraft;
 import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.events.CraftDetectEvent;
-import net.countercraft.movecraft.events.CraftPilotEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
-import net.countercraft.movecraft.events.CraftSinkEvent;
 import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.jetbrains.annotations.NotNull;
 
-import javax.print.attribute.HashAttributeSet;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.UUID;
 
 public class DetectionListener implements Listener {
 
@@ -31,7 +29,7 @@ public class DetectionListener implements Listener {
     public void onCraftDetect(CraftDetectEvent event) {
         Craft craft = event.getCraft();
         String craftName = craft.getType().getStringProperty(CraftType.NAME);
-        if (!Config.CraftAllowedCannons.containsKey(craftName) || Config.CraftAllowedCannons.get(craftName).isEmpty()) {
+        if (!Config.CraftAllowedCannons.containsKey(craftName)) {
             return;
         }
 
@@ -40,7 +38,7 @@ public class DetectionListener implements Listener {
         if (craft instanceof SubCraft subCraft) {
             LinkedHashSet<Cannon> subCraftCannons = new LinkedHashSet<>();
             for (Cannon cannon: getCannonsOnCraft(subCraft.getParent())) {
-                if (MathUtils.locIsNearCraftFast(subCraft, MathUtils.bukkit2MovecraftLoc(cannon.getCannonDesign().getFiringTrigger(cannon)))) {
+                if (subCraft.getHitBox().contains(MathUtils.bukkit2MovecraftLoc(cannon.getCannonDesign().getFiringTrigger(cannon)))) {
                     subCraftCannons.add(cannon);
                 }
             }
