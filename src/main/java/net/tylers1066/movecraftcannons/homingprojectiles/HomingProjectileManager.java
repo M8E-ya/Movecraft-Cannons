@@ -4,12 +4,15 @@ import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.event.ProjectileImpactEvent;
 import at.pavlov.cannons.projectile.FlyingProjectile;
 import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
@@ -30,8 +33,52 @@ import java.util.*;
 public class HomingProjectileManager implements Listener {
     private static final WeakHashMap<FlyingProjectile, Craft> homingProjectileTargetMap = new WeakHashMap<>();
     private static final HashMap<UUID, Craft> playerHomingTargetMap = new HashMap<>();
+    private static final BossBar targetedBossBar = BossBar.bossBar(
+            Component.text("Incoming missile!", NamedTextColor.RED, TextDecoration.BOLD),
+            1f,
+            BossBar.Color.RED,
+            BossBar.Overlay.PROGRESS,
+            EnumSet.of(BossBar.Flag.DARKEN_SCREEN)
+    );
 
     static {
+
+        // Play missile warning sounds to target-locked pilots
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (var entry : playerHomingTargetMap.entrySet()) {
+                    Player player = Bukkit.getPlayer(entry.getKey());
+                    if (player == null || CraftManager.getInstance().getCraftByPlayer(player) == null) {
+                        continue;
+                    }
+
+                    Craft targetCraft = entry.getValue();
+                    if (targetCraft instanceof PlayerCraft pcraft) {
+                        player.sendActionBar(Component.text("Target lock: " + pcraft.getPilot().getName(), NamedTextColor.YELLOW));
+                    }
+                }
+
+                for (FlyingProjectile flyingProjectile : Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
+                    Craft targetCraft = playerHomingTargetMap.get(flyingProjectile.getShooterUID());
+
+                    if (targetCraft instanceof PlayerCraft pcraft) {
+                        pcraft.getPilot().playSound(Sound.sound(Key.key("missile_launch_warning"),
+                                Sound.Source.MASTER, 1f, 1f), Sound.Emitter.self());
+
+                        // Show warning bossbar
+                        pcraft.getPilot().showBossBar(targetedBossBar);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                pcraft.getPilot().hideBossBar(targetedBossBar);
+                            }
+                        }.runTaskLater(MovecraftCannons.getInstance(), 40L);
+                    }
+                }
+            }
+        }.runTaskTimer(MovecraftCannons.getInstance(), 0L, 40L);
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -43,11 +90,7 @@ public class HomingProjectileManager implements Listener {
                     // Check if the projectile's shooter has a target.
                     if (playerHomingTargetMap.containsKey(flyingProjectile.getShooterUID())) {
                         Craft playerTargetCraft = playerHomingTargetMap.get(flyingProjectile.getShooterUID());
-                        homingProjectileTargetMap.put(flyingProjectile, playerTargetCraft);
-                        if (playerTargetCraft instanceof PlayerCraft pcraft) {
-                            pcraft.getPilot().playSound(Sound.sound(Key.key("missile_launch_warning"),
-                                    Sound.Source.MASTER, 1f, 1f), Sound.Emitter.self());
-                        }
+                        homingProjectileTargetMap.putIfAbsent(flyingProjectile, playerTargetCraft);
                     }
 
                     // If projectile has a target, direct it.
@@ -55,6 +98,7 @@ public class HomingProjectileManager implements Listener {
                         Craft targetCraft = homingProjectileTargetMap.get(flyingProjectile);
                         Location targetLocation = MovecraftUtils.getRandomBlockOnHitBox(targetCraft);
 
+                        // Direct the projectile towards a countermeasure projectile if there is one nearby
                         Projectile projectileEntity = flyingProjectile.getProjectileEntity();
                         for (FlyingProjectile otherProjectile : Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
                             if (otherProjectile != flyingProjectile
@@ -67,16 +111,8 @@ public class HomingProjectileManager implements Listener {
                         }
 
                         Location projectileLoc = projectileEntity.getLocation();
-
                         double speed = projectileEntity.getVelocity().length();
                         double distance = projectileLoc.distance(targetLocation);
-                        if (distance <= 0.5) {
-                            Cannons.getPlugin().getExplosion().detonate(flyingProjectile, flyingProjectile.getProjectileEntity(), BlockFace.UP);
-                            homingProjectileTargetMap.remove(flyingProjectile);
-                            flyingProjectile.getProjectileEntity().remove();
-                            continue;
-                        }
-
                         double multiplicationFactor = 1.25 / Math.sqrt(Math.max(distance, 1));
 
                         Vector newVector = projectileEntity.getVelocity()
@@ -89,7 +125,7 @@ public class HomingProjectileManager implements Listener {
                     }
                 }
             }
-        }.runTaskTimer(MovecraftCannons.getInstance(), 1L, 1L);
+        }.runTaskTimer(MovecraftCannons.getInstance(), 0L, 1L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
