@@ -34,7 +34,7 @@ public class FiringUtils {
                 fireCannon(cannon);
                 numCannons++;
             }
-            else {
+            else if (!useFiringVector) {
                 fireCannon(cannon);
             }
         }
