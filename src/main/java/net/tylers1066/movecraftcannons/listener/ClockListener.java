@@ -45,15 +45,7 @@ public class ClockListener implements Listener {
         // Check if the clock specifies a cannon type to manage
         String selectedCannonType = getSelectedCannonTypeFromItem(item);
 
-        // Right-click - aim
-        AimingUtils.aimCannonsOnCraft(craft, player, selectedCannonType);
-
-        // Aerial crafts will also fire, as well as aim
-        if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
-            var cannons = DetectionListener.getCannonsOnCraft(craft);
-            FiringUtils.fireCannons(player, cannons, true);
-        }
-
+        // Check if player is in a squadron.
         if (SquadronManager.getInstance().hasSquadron(player)) {
             Squadron squad = SquadronManager.getInstance().getPlayerSquadron(player, true);
             if (squad == null)
@@ -62,6 +54,16 @@ public class ClockListener implements Listener {
                 var squadCraftCannons = DetectionListener.getCannonsOnCraft(squadCraft);
                 FiringUtils.fireCannons(player, squadCraftCannons, true);
             }
+            return;
+        }
+
+        // Right-click - aim
+        AimingUtils.aimCannonsOnCraft(craft, player, selectedCannonType);
+
+        // Aerial crafts will also fire, as well as aim
+        if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
+            var cannons = DetectionListener.getCannonsOnCraft(craft);
+            FiringUtils.fireCannons(player, cannons, true);
         }
     }
 

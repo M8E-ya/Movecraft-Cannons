@@ -22,7 +22,6 @@ import java.util.LinkedHashSet;
 import java.util.UUID;
 
 public class DetectionListener implements Listener {
-
     public static HashMap<Craft, LinkedHashSet<Cannon>> cannonsOnCraft = new HashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -34,8 +33,12 @@ public class DetectionListener implements Listener {
         }
 
         UUID uuid;
+        // Squadron crafts: set cannon owner UUIDs to squadron pilot
+        if (craft instanceof SquadronCraft squadronCraft) {
+            uuid = squadronCraft.getSquadron().getPilot().getUniqueId();
+        }
         // Subcrafts: only include cannons that are inside the subcraft
-        if (craft instanceof SubCraft subCraft) {
+        else if (craft instanceof SubCraft subCraft) {
             LinkedHashSet<Cannon> subCraftCannons = new LinkedHashSet<>();
             for (Cannon cannon: getCannonsOnCraft(subCraft.getParent())) {
                 if (subCraft.getHitBox().contains(MathUtils.bukkit2MovecraftLoc(cannon.getCannonDesign().getFiringTrigger(cannon)))) {
@@ -49,9 +52,6 @@ public class DetectionListener implements Listener {
         }
         else if (craft instanceof PilotedCraft pilotedCraft) {
             uuid = pilotedCraft.getPilot().getUniqueId();
-        }
-        else if (craft instanceof SquadronCraft squadronCraft) {
-            uuid = squadronCraft.getSquadron().getPilot().getUniqueId();
         }
         else {
             return;
