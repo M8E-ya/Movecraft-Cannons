@@ -7,6 +7,7 @@ import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
 import me.halfquark.squadronsreloaded.squadron.SquadronManager;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.craft.type.CraftType;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
@@ -37,7 +38,7 @@ public class ClockListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
+        PlayerCraft craft = CraftManager.getInstance().getCraftByPlayer(player);
         if (craft == null || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
             return;
         }
@@ -54,6 +55,11 @@ public class ClockListener implements Listener {
                 var squadCraftCannons = DetectionListener.getCannonsOnCraft(squadCraft);
                 FiringUtils.fireCannons(player, squadCraftCannons, true);
             }
+            return;
+        }
+
+        // e.g. to stop an aircraft carrier from aiming while its pilot is directing a squadron
+        if (!SquadronManager.getInstance().getCarrierSquadrons(craft).isEmpty()) {
             return;
         }
 
@@ -75,13 +81,18 @@ public class ClockListener implements Listener {
             return;
         }
 
-        Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
+        PlayerCraft craft = CraftManager.getInstance().getCraftByPlayer(player);
         if (craft == null || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
             return;
         }
 
         // Aerial crafts only fire on right-click
         if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
+            return;
+        }
+
+        // e.g. to stop an aircraft carrier from firing while its pilot is directing a squadron
+        if (!SquadronManager.getInstance().getCarrierSquadrons(craft).isEmpty()) {
             return;
         }
 
