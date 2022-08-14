@@ -3,6 +3,7 @@ package net.tylers1066.movecraftcannons.listener;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.event.ProjectileImpactEvent;
 import at.pavlov.cannons.projectile.Projectile;
+import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.features.tracking.DamageRecord;
 import net.countercraft.movecraft.combat.features.tracking.events.CraftDamagedByEvent;
@@ -53,26 +54,21 @@ public class ProjectileImpactListener implements Listener {
     public void antiFriendlyFireListener(ProjectileImpactEvent event) {
         Location impactLocation = event.getImpactLocation();
 
-        Craft originCraft = null;
         Location cannonLocation = Cannons.getPlugin().getCannon(event.getFlyingProjectile().getCannonUID()).getLocation();
         if (cannonLocation == null) {
             return;
         }
 
-        for (Craft craft: CraftManager.getInstance().getCraftsInWorld(event.getFlyingProjectile().getWorld())) {
-            if (MathUtils.locationNearHitBox(craft.getHitBox(), cannonLocation, 1D)) {
-                originCraft = craft;
-                break;
-            }
-        }
+        Craft originCraft = MathUtils.fastNearestCraftToLoc(CraftManager.getInstance().getCraftsInWorld(cannonLocation.getWorld()), cannonLocation);
         // Blast did not originate from a craft - we ignore
-        if (originCraft == null) {
+        if (originCraft == null || !MathUtils.locationNearHitBox(originCraft.getHitBox(), cannonLocation, 1D)) {
             return;
         }
 
         if (MathUtils.locationNearHitBox(originCraft.getHitBox(), impactLocation, 1.0)) {
             Set<Craft> craftsAtImpactLocation = MovecraftUtils.getPlayerCraftsAtLocation(impactLocation, 1D);
             craftsAtImpactLocation.remove(originCraft);
+
             if (originCraft instanceof SubCraftImpl subCraft) {
                 craftsAtImpactLocation.remove(subCraft.getParent());
             }
@@ -83,6 +79,17 @@ public class ProjectileImpactListener implements Listener {
             }
 
             event.setCancelled(true);
+        }
+
+        // Prevent squadron crafts from damaging each other
+        Craft impactCraft = MathUtils.fastNearestCraftToLoc(CraftManager.getInstance().getCraftsInWorld(impactLocation.getWorld()), impactLocation);
+        if (impactCraft == null || !MathUtils.locationNearHitBox(impactCraft.getHitBox(), impactLocation, 1D)) {
+            return;
+        }
+        if (impactCraft instanceof SquadronCraft impactSquadronCraft && originCraft instanceof SquadronCraft originSquadronCraft) {
+            if (impactSquadronCraft.getSquadron() == originSquadronCraft.getSquadron()) {
+                event.setCancelled(true);
+            }
         }
     }
 
