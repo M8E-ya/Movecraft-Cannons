@@ -187,6 +187,7 @@ public final class MovecraftCannons extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new DetectionListener(), this);
             getServer().getPluginManager().registerEvents(new TranslationListener(), this);
             getServer().getPluginManager().registerEvents(new RotationListener(), this);
+            getServer().getPluginManager().registerEvents(new SinkListener(), this);
             getServer().getPluginManager().registerEvents(new CannonListener(), this);
             getServer().getPluginManager().registerEvents(new AimingListener(), this);
             getServer().getPluginManager().registerEvents(new ClockListener(), this);
