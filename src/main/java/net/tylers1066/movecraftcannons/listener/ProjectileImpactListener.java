@@ -1,6 +1,7 @@
 package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.Cannons;
+import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.event.ProjectileImpactEvent;
 import at.pavlov.cannons.projectile.Projectile;
 import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
@@ -54,7 +55,12 @@ public class ProjectileImpactListener implements Listener {
     public void antiFriendlyFireListener(ProjectileImpactEvent event) {
         Location impactLocation = event.getImpactLocation();
 
-        Location cannonLocation = Cannons.getPlugin().getCannon(event.getFlyingProjectile().getCannonUID()).getLocation();
+        Cannon cannon = Cannons.getPlugin().getCannon(event.getFlyingProjectile().getCannonUID());
+        if (cannon == null) {
+            return;
+        }
+
+        Location cannonLocation = cannon.getLocation();
         if (cannonLocation == null) {
             return;
         }
