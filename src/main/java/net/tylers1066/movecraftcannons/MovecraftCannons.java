@@ -193,7 +193,7 @@ public final class MovecraftCannons extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new ClockListener(), this);
             getServer().getPluginManager().registerEvents(new FireSign(), this);
             getServer().getPluginManager().registerEvents(new WeaponsScoreboard(), this);
-            getServer().getPluginManager().registerEvents(new HomingProjectileManager(), this);
+            getServer().getPluginManager().registerEvents(new HomingProjectileManager(this), this);
 
             ConfigurationSection materialDeflectionSection = getConfig().getConfigurationSection("MaterialDeflectionFactors");
             if (materialDeflectionSection == null) {

@@ -41,7 +41,7 @@ public class HomingProjectileManager implements Listener {
             EnumSet.of(BossBar.Flag.DARKEN_SCREEN)
     );
 
-    static {
+    public HomingProjectileManager(MovecraftCannons plugin) {
 
         // Play missile warning sounds to target-locked pilots
         new BukkitRunnable() {
@@ -77,13 +77,13 @@ public class HomingProjectileManager implements Listener {
                     }
                 }
             }
-        }.runTaskTimer(MovecraftCannons.getInstance(), 0L, 40L);
+        }.runTaskTimer(plugin, 0L, 40L);
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 for (FlyingProjectile flyingProjectile: Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
-                    if (!Config.HomingProjectiles.contains(flyingProjectile.getProjectile().getProjectileId())) {
+                    if (!Config.HomingProjectiles.contains(flyingProjectile.getProjectile().getProjectileId()) || !flyingProjectile.isValid()) {
                         continue;
                     }
 
@@ -125,7 +125,7 @@ public class HomingProjectileManager implements Listener {
                     }
                 }
             }
-        }.runTaskTimer(MovecraftCannons.getInstance(), 0L, 1L);
+        }.runTaskTimer(plugin, 0L, 1L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
