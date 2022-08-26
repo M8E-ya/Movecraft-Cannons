@@ -7,6 +7,7 @@ import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.craft.*;
 import net.countercraft.movecraft.util.MathUtils;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
@@ -94,8 +95,18 @@ public class MovecraftUtils {
         return craft.getHitBox().getMidPoint().toBukkit(craft.getWorld());
     }
 
-    public static Location getRandomBlockOnHitBox(Craft craft) {
-        return craft.getHitBox().asSet().iterator().next().toBukkit(craft.getWorld());
+    public static MovecraftLocation getRandomBlockOnHitBox(Craft craft) {
+        int blocksOnCraft = craft.getHitBox().size();
+        int randomNumber = new Random().nextInt(0, blocksOnCraft);
+
+        int counter = 0;
+        var iterator = craft.getHitBox().asSet().iterator();
+        while (counter < randomNumber - 1) {
+            iterator.next();
+            counter++;
+        }
+
+        return iterator.next();
     }
 
     @Nullable

@@ -31,7 +31,7 @@ import org.bukkit.util.Vector;
 import java.util.*;
 
 public class HomingProjectileManager implements Listener {
-    private static final WeakHashMap<FlyingProjectile, Craft> homingProjectileTargetMap = new WeakHashMap<>();
+    private static final WeakHashMap<FlyingProjectile, HomingProjectileTarget> homingProjectileTargetMap = new WeakHashMap<>();
     private static final HashMap<UUID, Craft> playerHomingTargetMap = new HashMap<>();
     private static final BossBar targetedBossBar = BossBar.bossBar(
             Component.text("Incoming missile!", NamedTextColor.RED, TextDecoration.BOLD),
@@ -90,39 +90,44 @@ public class HomingProjectileManager implements Listener {
                     // Check if the projectile's shooter has a target.
                     if (playerHomingTargetMap.containsKey(flyingProjectile.getShooterUID())) {
                         Craft playerTargetCraft = playerHomingTargetMap.get(flyingProjectile.getShooterUID());
-                        homingProjectileTargetMap.putIfAbsent(flyingProjectile, playerTargetCraft);
+                        homingProjectileTargetMap.computeIfAbsent(flyingProjectile, k -> new HomingProjectileTarget(playerTargetCraft));
                     }
 
-                    // If projectile has a target, direct it.
-                    if (homingProjectileTargetMap.containsKey(flyingProjectile)) {
-                        Craft targetCraft = homingProjectileTargetMap.get(flyingProjectile);
-                        Location targetLocation = MovecraftUtils.getRandomBlockOnHitBox(targetCraft);
+                    if (!homingProjectileTargetMap.containsKey(flyingProjectile)) {
+                        continue;
+                    }
 
-                        // Direct the projectile towards a countermeasure projectile if there is one nearby
-                        Projectile projectileEntity = flyingProjectile.getProjectileEntity();
-                        for (FlyingProjectile otherProjectile : Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
-                            if (otherProjectile != flyingProjectile
-                                    && Config.CountermeasureProjectiles.contains(otherProjectile.getProjectile().getProjectileId())
-                                    && !otherProjectile.getShooterUID().equals(flyingProjectile.getShooterUID())
-                                    && projectileEntity.getLocation().distanceSquared(otherProjectile.getProjectileEntity().getLocation()) <= Math.pow(Config.CountermeasureRange, 2)) {
-                                targetLocation = otherProjectile.getProjectileEntity().getLocation();
-                                break;
-                            }
+                    // We know the projectile has a target, so direct it.
+                    Location targetLocation = homingProjectileTargetMap.get(flyingProjectile).getTargetLocation();
+
+                    // Direct the projectile towards a countermeasure projectile if there is one nearby
+                    Projectile projectileEntity = flyingProjectile.getProjectileEntity();
+                    for (FlyingProjectile otherProjectile : Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
+                        if (otherProjectile != flyingProjectile
+                                && Config.CountermeasureProjectiles.contains(otherProjectile.getProjectile().getProjectileId())
+                                && !otherProjectile.getShooterUID().equals(flyingProjectile.getShooterUID())
+                                && projectileEntity.getLocation().distanceSquared(otherProjectile.getProjectileEntity().getLocation()) <= Math.pow(Config.CountermeasureRange, 2)) {
+                            targetLocation = otherProjectile.getProjectileEntity().getLocation();
+                            break;
                         }
-
-                        Location projectileLoc = projectileEntity.getLocation();
-                        double speed = projectileEntity.getVelocity().length();
-                        double distance = projectileLoc.distance(targetLocation);
-                        double multiplicationFactor = 1.25 / Math.sqrt(Math.max(distance, 1));
-
-                        Vector newVector = projectileEntity.getVelocity()
-                                .add(targetLocation.subtract(projectileLoc).toVector().normalize().multiply(multiplicationFactor))
-                                .normalize()
-                                .multiply(speed);
-
-                        flyingProjectile.teleport(projectileEntity.getLocation(), newVector);
-                        projectileEntity.setVelocity(newVector);
                     }
+
+                    Location projectileLoc = projectileEntity.getLocation();
+                    double speed = projectileEntity.getVelocity().length();
+                    double distance = projectileLoc.distance(targetLocation);
+                    double multiplicationFactor = 1.25 / Math.sqrt(Math.max(distance, 1));
+
+                    Vector newVector = projectileEntity.getVelocity()
+                            .add(targetLocation.subtract(projectileLoc).toVector().normalize().multiply(multiplicationFactor))
+                            .normalize()
+                            .multiply(speed);
+
+                    if (flyingProjectile.isInWater()) {
+                        newVector = newVector.setY(3);
+                    }
+
+                    flyingProjectile.teleport(projectileEntity.getLocation(), newVector);
+                    projectileEntity.setVelocity(newVector);
                 }
             }
         }.runTaskTimer(plugin, 0L, 1L);
