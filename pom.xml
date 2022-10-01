@@ -83,7 +83,7 @@
             <artifactId>SquadronsReloaded</artifactId>
             <version>3.0.2</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/../../SquadronsReloaded/target/SquadronsReloaded-3.0.2.jar</systemPath>
+            <systemPath>${project.basedir}/../SquadronsReloaded/target/SquadronsReloaded-3.0.2.jar</systemPath>
         </dependency>
     </dependencies>
 

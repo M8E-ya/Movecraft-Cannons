@@ -2,10 +2,7 @@ package net.tylers1066.movecraftcannons.homingprojectiles;
 
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.Resident;
-import net.countercraft.movecraft.craft.Craft;
-import net.countercraft.movecraft.craft.CraftManager;
-import net.countercraft.movecraft.craft.PlayerCraft;
-import net.countercraft.movecraft.craft.SinkingCraft;
+import net.countercraft.movecraft.craft.*;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
@@ -59,7 +56,7 @@ public class LockOnCommand implements TabExecutor {
 
             lockonCraft = MovecraftUtils.getNearestCraftToCraft(craft, craft.getContacts());
             if (lockonCraft instanceof SinkingCraft) {
-                sender.sendMessage(Component.text("There are no crafts nearby to target lock.", NamedTextColor.RED));
+                sender.sendMessage(Component.text("The closest craft is sinking! Cannot target lock.", NamedTextColor.RED));
                 return true;
             }
 
@@ -91,6 +88,10 @@ public class LockOnCommand implements TabExecutor {
         }
 
         HomingProjectileManager.getPlayerHomingTargetMap().put(player.getUniqueId(), lockonCraft);
+
+        if (lockonPlayer == null && lockonCraft instanceof PilotedCraft pilotedCraft) {
+            lockonPlayer = pilotedCraft.getPilot();
+        }
 
         TextComponent.Builder message = Component.text().content("Target lock acquired.");
         if (lockonPlayer != null) {

@@ -72,10 +72,17 @@ MaterialCoefficientOfRestitution:
   COMMAND_BLOCK: 1.0
 
 HomingProjectiles:
-  - "AirLaunchedMissile"
-
-CountermeasureProjectiles:
-  - "Flare"
+  AirLaunchedMissile:
+    name: "Air-Launched Missile"
+    turning-factor: 1.0
+    is-water: false
+    countermeasure-projectiles:
+      - "Flare"
+  Torpedo:
+    name: "Torpedo"
+    turning-factor: 1.0
+    is-water: true
+    countermeasure-projectiles: []
 
 CountermeasureRange: 100
 

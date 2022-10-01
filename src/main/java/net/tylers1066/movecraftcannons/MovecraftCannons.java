@@ -12,9 +12,7 @@ import net.countercraft.movecraft.combat.MovecraftCombat;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.type.CraftType;
-import net.countercraft.movecraft.craft.type.TypeData;
 import net.countercraft.movecraft.craft.type.property.BooleanProperty;
-import net.countercraft.movecraft.craft.type.property.ObjectPropertyImpl;
 import net.countercraft.movecraft.util.MathUtils;
 import net.countercraft.movecraft.util.Tags;
 import net.countercraft.movecraft.util.hitboxes.HitBox;
@@ -24,11 +22,11 @@ import net.tylers1066.movecraftcannons.firing.FireCommand;
 import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.firing.FireSign;
 import net.tylers1066.movecraftcannons.homingprojectiles.HomingProjectileManager;
+import net.tylers1066.movecraftcannons.homingprojectiles.HomingProjectileType;
 import net.tylers1066.movecraftcannons.homingprojectiles.LockOnCommand;
 import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.scoreboard.WeaponsScoreboard;
-import net.tylers1066.movecraftcannons.type.MaxCannonsEntry;
 import net.tylers1066.movecraftcannons.type.MaxCannonsProperty;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -161,28 +159,29 @@ public final class MovecraftCannons extends JavaPlugin {
             }
 
             // Load homing projectile types
-            for (String projectileName: getConfig().getStringList("HomingProjectiles")) {
-                Projectile projectile = Cannons.getPlugin().getProjectileStorage().getByName(projectileName);
-                if (projectile == null) {
+
+            for (String projectileName: getConfig().getConfigurationSection("HomingProjectiles").getKeys(false)) {
+                // Check if a valid Cannons projectile of this name exists
+                Projectile cannonsProjectile = Cannons.getPlugin().getProjectileStorage().getByName(projectileName);
+                if (cannonsProjectile == null) {
                     getLogger().severe(projectileName + " is not a valid Cannons projectile!");
                     continue;
                 }
-                Config.HomingProjectiles.add(projectileName);
+
+                ConfigurationSection homingProjectileEntry = getConfig().getConfigurationSection("HomingProjectiles." + projectileName);
+
+                String name = homingProjectileEntry.getString("name");
+                double turningFactor = homingProjectileEntry.getDouble("turning-factor", 1.0);
+                boolean isWater = homingProjectileEntry.getBoolean("is-water", false);
+                List<String> countermeasureProjectiles = homingProjectileEntry.getStringList("countermeasure-projectiles");
+
+                HomingProjectileType homingType = new HomingProjectileType(name, countermeasureProjectiles, turningFactor, isWater);
+                getLogger().info("Loaded a homing projectile type with name " + name);
+                Config.HomingProjectiles.put(projectileName, homingType);
             }
 
             Config.CountermeasureRange = getConfig().getDouble("CountermeasureRange");
             getLogger().info("Set countermeasure range to " + Config.CountermeasureRange);
-
-            // Load countermeasure projectile types
-            for (String projectileName: getConfig().getStringList("CountermeasureProjectiles")) {
-                Projectile projectile = Cannons.getPlugin().getProjectileStorage().getByName(projectileName);
-                if (projectile == null) {
-                    getLogger().severe(projectileName + " is not a valid Cannons projectile!");
-                    continue;
-                }
-                Config.CountermeasureProjectiles.add(projectileName);
-                getLogger().info(projectileName + " registered as a countermeasure projectile");
-            }
 
             getServer().getPluginManager().registerEvents(new DetectionListener(), this);
             getServer().getPluginManager().registerEvents(new TranslationListener(), this);

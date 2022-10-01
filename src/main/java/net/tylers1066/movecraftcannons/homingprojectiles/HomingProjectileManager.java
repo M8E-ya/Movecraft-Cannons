@@ -83,9 +83,10 @@ public class HomingProjectileManager implements Listener {
             @Override
             public void run() {
                 for (FlyingProjectile flyingProjectile: Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
-                    if (!Config.HomingProjectiles.contains(flyingProjectile.getProjectile().getProjectileId()) || !flyingProjectile.isValid()) {
+                    if (!Config.HomingProjectiles.containsKey(flyingProjectile.getProjectile().getProjectileId()) || !flyingProjectile.isValid()) {
                         continue;
                     }
+                    HomingProjectileType homingProjectileType = Config.HomingProjectiles.get(flyingProjectile.getProjectile().getProjectileId());
 
                     // Check if the projectile's shooter has a target.
                     if (playerHomingTargetMap.containsKey(flyingProjectile.getShooterUID())) {
@@ -104,7 +105,7 @@ public class HomingProjectileManager implements Listener {
                     Projectile projectileEntity = flyingProjectile.getProjectileEntity();
                     for (FlyingProjectile otherProjectile : Cannons.getPlugin().getProjectileManager().getFlyingProjectiles().values()) {
                         if (otherProjectile != flyingProjectile
-                                && Config.CountermeasureProjectiles.contains(otherProjectile.getProjectile().getProjectileId())
+                                && homingProjectileType.getCountermeasureProjectiles().contains(otherProjectile.getProjectile().getProjectileId())
                                 && !otherProjectile.getShooterUID().equals(flyingProjectile.getShooterUID())
                                 && projectileEntity.getLocation().distanceSquared(otherProjectile.getProjectileEntity().getLocation()) <= Math.pow(Config.CountermeasureRange, 2)) {
                             targetLocation = otherProjectile.getProjectileEntity().getLocation();
@@ -115,15 +116,21 @@ public class HomingProjectileManager implements Listener {
                     Location projectileLoc = projectileEntity.getLocation();
                     double speed = projectileEntity.getVelocity().length();
                     double distance = projectileLoc.distance(targetLocation);
-                    double multiplicationFactor = 1.25 / Math.sqrt(Math.max(distance, 1));
+                    double multiplicationFactor = homingProjectileType.getTurningFactor() / Math.sqrt(Math.max(distance, 1));
 
                     Vector newVector = projectileEntity.getVelocity()
                             .add(targetLocation.subtract(projectileLoc).toVector().normalize().multiply(multiplicationFactor))
                             .normalize()
                             .multiply(speed);
 
-                    if (flyingProjectile.isInWater()) {
+                    // Avoid entering water if the projectile is not set as an underwater projectile
+                    if (!homingProjectileType.isWater() && flyingProjectile.isInWater()) {
                         newVector = newVector.setY(3);
+                    }
+
+                    // Avoid exiting water if the projectile is set as an underwater projectile
+                    else if (homingProjectileType.isWater() && !flyingProjectile.isInWater()) {
+                        newVector = newVector.setY(-1);
                     }
 
                     flyingProjectile.teleport(projectileEntity.getLocation(), newVector);
@@ -155,7 +162,7 @@ public class HomingProjectileManager implements Listener {
             playerHomingTargetMap.remove(uuid);
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                player.sendMessage(Component.text("Your target-locked craft has been released!", NamedTextColor.RED));
+                player.sendRichMessage("<red>Your target-locked craft has been released!");
             }
         });
     }

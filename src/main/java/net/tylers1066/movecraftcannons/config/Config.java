@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.type.CraftType;
+import net.tylers1066.movecraftcannons.homingprojectiles.HomingProjectileType;
 import org.openjdk.jmh.util.HashMultimap;
 import org.openjdk.jmh.util.HashsetMultimap;
 
@@ -26,8 +27,7 @@ public class Config {
     public static final Map<String, List<MaxCannonEntry>> CraftMaxAllowedCannons = new HashMap<>();
 
     // Projectiles
-    public static final Set<String> HomingProjectiles = new HashSet<>();
-    public static final Set<String> CountermeasureProjectiles = new HashSet<>();
+    public static final Map<String, HomingProjectileType> HomingProjectiles = new HashMap<>();
     public static double CountermeasureRange = 0;
     public static final Multimap<String, String> ProjectilesOnlyDamageCrafts = MultimapBuilder.hashKeys().hashSetValues().build();
 
