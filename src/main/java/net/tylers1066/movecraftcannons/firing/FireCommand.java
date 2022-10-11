@@ -32,7 +32,7 @@ public class FireCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(Component.text("Only players can use this command.", NamedTextColor.RED));
+            sender.sendRichMessage("<red>Only players can use this command.");
             return true;
         }
 
@@ -44,18 +44,18 @@ public class FireCommand implements TabExecutor {
 
         Set<Cannon> cannonsOnCraft = DetectionListener.getCannonsOnCraft(craft);
         if (cannonsOnCraft.isEmpty() || !craft.getType().getBoolProperty(MovecraftCannons.CAN_USE_CANNONS)) {
-            player.sendMessage(Component.text("There are no cannons on your craft to fire.", NamedTextColor.RED));
+            player.sendRichMessage("<red>There are no cannons on your craft to fire.");
             return true;
         }
 
         if (args.length == 1) {
             CannonDesign selectedDesign = Cannons.getPlugin().getCannonDesign(args[0]);
             if (selectedDesign == null) {
-                player.sendMessage(Component.text(args[0] + " is not a valid cannon type.", NamedTextColor.RED));
+                player.sendRichMessage("<red>" + args[0] + " is not a valid cannon type.");
                 return true;
             }
 
-            cannonsOnCraft.removeIf(cannon -> !cannon.getCannonDesign().getDesignName().equalsIgnoreCase(args[0]));
+            cannonsOnCraft.removeIf(cannon -> !cannon.getCannonDesign().getMessageName().equalsIgnoreCase(selectedDesign.getMessageName()));
         }
 
         FiringUtils.fireCannons(player, cannonsOnCraft, true);

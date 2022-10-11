@@ -3,6 +3,7 @@ package net.tylers1066.movecraftcannons.aiming;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.Enum.InteractAction;
 import at.pavlov.cannons.cannon.Cannon;
+import at.pavlov.cannons.cannon.CannonDesign;
 import com.palmergames.bukkit.towny.TownyAPI;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
@@ -55,14 +56,31 @@ public class AimingListener implements Listener {
             return;
         }
 
-        String cannonType = PlainTextComponentSerializer.plainText().serialize(sign.lines().get(1));
-        if (Cannons.getPlugin().getDesignStorage().getDesignIds().contains(cannonType)) {
-            AimingUtils.getPlayerCannonSelections().put(player.getUniqueId(), cannonType);
-            player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Selected cannon type"), cannonType), TextColor.color(0xc3f09e)));
+        String selectedCannonType = null;
+        String signCannonType = PlainTextComponentSerializer.plainText().serialize(sign.lines().get(1));
+
+        if (signCannonType.isEmpty()) {
+            selectedCannonType = "all";
         }
-        else if (cannonType.equalsIgnoreCase("all")) {
+        else {
+            for (CannonDesign design: Cannons.getPlugin().getDesignStorage().getCannonDesignList()) {
+                if (design.getMessageName().equalsIgnoreCase(signCannonType)) {
+                    selectedCannonType = design.getMessageName();
+                    break;
+                }
+            }
+        }
+
+        if (selectedCannonType == null) {
+            player.sendRichMessage("<red>There is no cannon design named " + signCannonType + ".");
+        }
+        else if (selectedCannonType.equals("all")) {
             AimingUtils.getPlayerCannonSelections().remove(player.getUniqueId());
             player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Deselected cannon type"), TextColor.color(0xc3f09e)));
+        }
+        else {
+            AimingUtils.getPlayerCannonSelections().put(player.getUniqueId(), selectedCannonType);
+            player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Selected cannon type"), selectedCannonType), TextColor.color(0xc3f09e)));
         }
     }
 

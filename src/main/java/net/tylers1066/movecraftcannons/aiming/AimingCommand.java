@@ -1,6 +1,7 @@
 package net.tylers1066.movecraftcannons.aiming;
 
 import at.pavlov.cannons.Cannons;
+import at.pavlov.cannons.cannon.CannonDesign;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -40,14 +41,21 @@ public class AimingCommand implements TabExecutor {
         String cannonType = null;
         if (args.length == 1) {
             cannonType = args[0];
-            if (Cannons.getPlugin().getDesignStorage().getDesignIds().contains(args[0])) {
+
+            if (cannonType.equalsIgnoreCase("all")) {
+                if (AimingUtils.getPlayerCannonSelections().containsKey(player.getUniqueId())) {
+                    AimingUtils.getPlayerCannonSelections().remove(player.getUniqueId());
+                    player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Deselected cannon type"), TextColor.color(0xc3f09e)));
+                }
+                cannonType = null;
+            }
+
+            else if (Cannons.getPlugin().getDesignStorage().getDesignIds().contains(cannonType)) {
+                cannonType = Cannons.getPlugin().getCannonDesign(cannonType).getMessageName();
                 player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Selected cannon type"), cannonType), TextColor.color(0xc3f09e)));
                 AimingUtils.getPlayerCannonSelections().put(player.getUniqueId(), cannonType);
             }
-            else if (cannonType.equalsIgnoreCase("all")) {
-                AimingUtils.getPlayerCannonSelections().remove(player.getUniqueId());
-                player.sendMessage(Component.text(I18nSupport.getInternationalisedString("Deselected cannon type"), TextColor.color(0xc3f09e)));
-            }
+
             else {
                 player.sendMessage(Component.text(String.format(I18nSupport.getInternationalisedString("Invalid cannon type"), cannonType), TextColor.color(0xffb2ab)));
                 return true;

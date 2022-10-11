@@ -45,7 +45,7 @@ public class AimingUtils {
         GunAngles angles;
 
         for (Cannon cannon : cannonList) {
-            if (cannonType != null && !cannon.getCannonDesign().getDesignName().equals(cannonType)) {
+            if (cannonType != null && !cannon.getCannonDesign().getMessageName().equals(cannonType)) {
                 continue;
             }
 

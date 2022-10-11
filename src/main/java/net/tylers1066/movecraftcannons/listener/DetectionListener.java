@@ -100,6 +100,12 @@ public class DetectionListener implements Listener {
         cannonsOnCraft.remove(event.getCraft());
     }
 
+    /**
+     * Returns a copy of the set of cannons associated with a given craft
+     * @param craft - the craft to get cannons for
+     * @return a copy of the set of cannons associated with the craft, ordered alphabetically according to their
+     *         design name.
+     */
     @NotNull
     public static LinkedHashSet<Cannon> getCannonsOnCraft(Craft craft) {
         if (cannonsOnCraft.containsKey(craft)) {

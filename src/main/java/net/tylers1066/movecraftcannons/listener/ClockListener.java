@@ -1,6 +1,7 @@
 package net.tylers1066.movecraftcannons.listener;
 
 import at.pavlov.cannons.Cannons;
+import at.pavlov.cannons.cannon.CannonDesign;
 import io.papermc.paper.event.player.PlayerArmSwingEvent;
 import me.halfquark.squadronsreloaded.squadron.Squadron;
 import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
@@ -105,7 +106,7 @@ public class ClockListener implements Listener {
         String selectedCannonType = getSelectedCannonTypeFromItem(item);
         // Filter non-selected cannons
         if (selectedCannonType != null) {
-            cannons.removeIf(cannon -> !cannon.getCannonDesign().getDesignName().equals(selectedCannonType));
+            cannons.removeIf(cannon -> !cannon.getCannonDesign().getMessageName().equals(selectedCannonType));
         }
 
         FiringUtils.fireCannons(player, cannons, true);
@@ -119,9 +120,10 @@ public class ClockListener implements Listener {
             ItemMeta meta = item.getItemMeta();
             if (meta.hasDisplayName()) {
                 String name = PlainTextComponentSerializer.plainText().serialize(meta.displayName());
-                for (String designName: Cannons.getPlugin().getDesignStorage().getDesignIds()) {
-                    if (name.equalsIgnoreCase(designName)) {
-                        selectedCannonType = designName;
+                for (CannonDesign design: Cannons.getPlugin().getDesignStorage().getCannonDesignList()) {
+                    String messageName = design.getMessageName();
+                    if (name.equalsIgnoreCase(messageName)) {
+                        selectedCannonType = messageName;
                         break;
                     }
                 }
