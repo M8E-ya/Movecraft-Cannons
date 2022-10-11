@@ -2,6 +2,7 @@ package net.tylers1066.movecraftcannons.firing;
 
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
+import at.pavlov.cannons.cannon.CannonDesign;
 import com.palmergames.bukkit.towny.TownyAPI;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.PlayerCraft;
@@ -12,6 +13,7 @@ import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Tag;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -31,7 +33,7 @@ public class FireSign implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || !Tag.SIGNS.isTagged(event.getMaterial())) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || !Tag.SIGNS.isTagged(event.getClickedBlock().getType())) {
             return;
         }
 
@@ -55,7 +57,8 @@ public class FireSign implements Listener {
 
         String givenCannonName = PlainTextComponentSerializer.plainText().serialize(sign.lines().get(1));
         String selectedCannonType = null;
-        for (String designName: Cannons.getPlugin().getDesignStorage().getDesignIds()) {
+        for (CannonDesign design: Cannons.getPlugin().getDesignStorage().getCannonDesignList()) {
+            String designName = design.getMessageName();
             if (designName.equalsIgnoreCase(givenCannonName)) {
                 selectedCannonType = designName;
                 break;
@@ -64,7 +67,7 @@ public class FireSign implements Listener {
 
         if (selectedCannonType != null) {
             String finalSelectedCannonType = selectedCannonType;
-            cannonsOnCraft.removeIf(cannon -> !cannon.getCannonDesign().getDesignName().equals(finalSelectedCannonType));
+            cannonsOnCraft.removeIf(cannon -> !cannon.getCannonDesign().getMessageName().equals(finalSelectedCannonType));
         }
 
         // We will only fire cannons whose direction matches the direction opposite to the sign's text-facing side.
