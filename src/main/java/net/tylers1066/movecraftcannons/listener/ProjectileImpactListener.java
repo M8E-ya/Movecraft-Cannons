@@ -4,6 +4,7 @@ import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.event.ProjectileImpactEvent;
 import at.pavlov.cannons.projectile.Projectile;
+import at.pavlov.cannons.projectile.ProjectileProperties;
 import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
 import net.countercraft.movecraft.MovecraftLocation;
 import net.countercraft.movecraft.combat.features.tracking.DamageRecord;
@@ -53,6 +54,11 @@ public class ProjectileImpactListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void antiFriendlyFireListener(ProjectileImpactEvent event) {
+        // Allow observer projectiles to always work
+        if (event.getProjectile().hasProperty(ProjectileProperties.OBSERVER)) {
+            return;
+        }
+
         Location impactLocation = event.getImpactLocation();
 
         Cannon cannon = Cannons.getPlugin().getCannon(event.getFlyingProjectile().getCannonUID());
@@ -101,6 +107,11 @@ public class ProjectileImpactListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void enforceProjectileCraftDamageRestriction(ProjectileImpactEvent event) {
+        // Allow observer projectiles to always work
+        if (event.getProjectile().hasProperty(ProjectileProperties.OBSERVER)) {
+            return;
+        }
+
         String projectileName = event.getProjectile().getProjectileId();
         Collection<String> allowedToDamageCraftTypes = Config.ProjectilesOnlyDamageCrafts.get(projectileName);
         if (allowedToDamageCraftTypes.isEmpty()) {
