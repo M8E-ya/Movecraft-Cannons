@@ -7,6 +7,7 @@ import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
+import net.countercraft.movecraft.events.CraftSinkEvent;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -151,10 +152,19 @@ public class HomingProjectileManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onCraftSink(CraftSinkEvent event) {
+        processCraftDestruction(event.getCraft());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onCraftRelease(CraftReleaseEvent event) {
+        processCraftDestruction(event.getCraft());
+    }
+
+    private void processCraftDestruction(Craft craft) {
         Set<UUID> playersToRemove = new HashSet<>();
         for (Map.Entry<UUID, Craft> entry: playerHomingTargetMap.entrySet()) {
-            if (entry.getValue() == event.getCraft()) {
+            if (entry.getValue() == craft) {
                 playersToRemove.add(entry.getKey());
             }
         }
@@ -162,7 +172,7 @@ public class HomingProjectileManager implements Listener {
             playerHomingTargetMap.remove(uuid);
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                player.sendRichMessage("<red>Your target-locked craft has been released!");
+                player.sendRichMessage("<red>Your target-locked craft is now invalid!");
             }
         });
     }
