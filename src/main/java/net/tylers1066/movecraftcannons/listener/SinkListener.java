@@ -13,7 +13,7 @@ public class SinkListener implements Listener {
     public void onCraftSink(CraftSinkEvent event) {
         var craftCannons = DetectionListener.getCannonsOnCraft(event.getCraft());
         for (Cannon cannon: craftCannons) {
-            cannon.destroyCannon(true, true, BreakCause.ShipDestroyed);
+            cannon.destroyCannon(false, false, BreakCause.ShipDestroyed);
         }
     }
 
