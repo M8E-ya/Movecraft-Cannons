@@ -98,8 +98,11 @@ public class ProjectileImpactListener implements Listener {
         if (impactCraft == null || !MathUtils.locationNearHitBox(impactCraft.getHitBox(), impactLocation, 1D)) {
             return;
         }
-        if (impactCraft instanceof SquadronCraft impactSquadronCraft && originCraft instanceof SquadronCraft originSquadronCraft) {
-            if (impactSquadronCraft.getSquadron() == originSquadronCraft.getSquadron()) {
+        if (originCraft instanceof SquadronCraft originSquadronCraft) {
+            if (impactCraft instanceof SquadronCraft impactSquadronCraft && impactSquadronCraft.getSquadron() == originSquadronCraft.getSquadron()) {
+                event.setCancelled(true);
+            }
+            if (originSquadronCraft.getSquadron().getCarrier() == impactCraft) {
                 event.setCancelled(true);
             }
         }
