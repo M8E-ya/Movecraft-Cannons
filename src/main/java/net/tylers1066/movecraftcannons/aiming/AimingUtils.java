@@ -12,6 +12,7 @@ import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
+import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import org.bukkit.Location;
@@ -88,6 +89,10 @@ public class AimingUtils {
     }
 
     public static boolean cannonCanFireAtVector(Cannon cannon, Vector targetVector) {
+        if (Config.AlwaysFireWhenTriggeredCannons.contains(cannon.getCannonDesign().getDesignID())) {
+            return true;
+        }
+
         Vector muzzleVector = cannon.getMuzzle().toVector();
         Vector direction = targetVector.clone().subtract(muzzleVector);
 

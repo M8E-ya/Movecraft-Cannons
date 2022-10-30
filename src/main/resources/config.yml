@@ -90,3 +90,7 @@ ProjectileOnlyDamageCrafts:
   AntiAirAmmo:
     - "Fighter"
     - "Bomber"
+    - "Zeppelin"
+
+AlwaysFireWhenTriggeredCannons:
+  - BombBay

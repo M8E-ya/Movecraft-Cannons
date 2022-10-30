@@ -26,6 +26,8 @@ public class Config {
     public static final Map<String, List<String>> CraftAllowedCannons = new HashMap<>();
     public static final Map<String, List<MaxCannonEntry>> CraftMaxAllowedCannons = new HashMap<>();
 
+    public static List<String> AlwaysFireWhenTriggeredCannons = new ArrayList<>();
+
     // Projectiles
     public static final Map<String, HomingProjectileType> HomingProjectiles = new HashMap<>();
     public static double CountermeasureRange = 0;

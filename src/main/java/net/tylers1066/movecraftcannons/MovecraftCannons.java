@@ -183,6 +183,8 @@ public final class MovecraftCannons extends JavaPlugin {
             Config.CountermeasureRange = getConfig().getDouble("CountermeasureRange");
             getLogger().info("Set countermeasure range to " + Config.CountermeasureRange);
 
+            Config.AlwaysFireWhenTriggeredCannons = getConfig().getStringList("AlwaysFireWhenTriggeredCannons");
+
             getServer().getPluginManager().registerEvents(new DetectionListener(), this);
             getServer().getPluginManager().registerEvents(new TranslationListener(), this);
             getServer().getPluginManager().registerEvents(new RotationListener(), this);
