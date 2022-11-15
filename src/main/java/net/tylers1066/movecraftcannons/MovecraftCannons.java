@@ -26,7 +26,8 @@ import net.tylers1066.movecraftcannons.homingprojectiles.HomingProjectileType;
 import net.tylers1066.movecraftcannons.homingprojectiles.LockOnCommand;
 import net.tylers1066.movecraftcannons.listener.*;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
-import net.tylers1066.movecraftcannons.scoreboard.WeaponsScoreboard;
+import net.tylers1066.movecraftcannons.scoreboard.SquadronsHUD;
+import net.tylers1066.movecraftcannons.scoreboard.WeaponsHUD;
 import net.tylers1066.movecraftcannons.type.MaxCannonsProperty;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -193,7 +194,8 @@ public final class MovecraftCannons extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new AimingListener(), this);
             getServer().getPluginManager().registerEvents(new ClockListener(), this);
             getServer().getPluginManager().registerEvents(new FireSign(), this);
-            getServer().getPluginManager().registerEvents(new WeaponsScoreboard(), this);
+            getServer().getPluginManager().registerEvents(new WeaponsHUD(this), this);
+            getServer().getPluginManager().registerEvents(new SquadronsHUD(this), this);
             getServer().getPluginManager().registerEvents(new HomingProjectileManager(this), this);
 
             ConfigurationSection materialDeflectionSection = getConfig().getConfigurationSection("MaterialDeflectionFactors");

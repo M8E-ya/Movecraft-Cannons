@@ -31,12 +31,13 @@ import org.bukkit.scoreboard.Team;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 
-public class WeaponsScoreboard implements Listener {
-    private final HashSet<UUID> weaponScoreboardPlayers = new HashSet<>();
+public class WeaponsHUD implements Listener {
+    private static final Set<UUID> weaponScoreboardPlayers = new HashSet<>();
 
-    public WeaponsScoreboard() {
+    public WeaponsHUD(MovecraftCannons plugin) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -48,7 +49,7 @@ public class WeaponsScoreboard implements Listener {
                     updateWeaponsScoreboard(player);
                 }
             }
-        }.runTaskTimerAsynchronously(MovecraftCannons.getInstance(), 1L, 2L);
+        }.runTaskTimerAsynchronously(plugin, 1L, 2L);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -158,11 +159,11 @@ public class WeaponsScoreboard implements Listener {
             if (team.prefix().equals(newLine))
                 continue;
 
-            team.prefix(createCannonLine(cannon));
+            team.prefix(newLine);
         }
     }
 
-    public void removeWeaponsScoreboard(Player player) {
+    public static void removeWeaponsScoreboard(Player player) {
         Scoreboard board = player.getScoreboard();
         if (board.getObjective("CraftHUD") == null) {
             return;
@@ -221,7 +222,7 @@ public class WeaponsScoreboard implements Listener {
         }
     }
 
-    private TextColor getHullIntegrityColor(int percentage) {
+    public static TextColor getHullIntegrityColor(int percentage) {
         if (percentage <= 100 && percentage >= 80) {
             return NamedTextColor.GREEN;
         }
