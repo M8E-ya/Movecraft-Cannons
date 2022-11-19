@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 public class FiringUtils {
-    private static final EnumSet<Material> materialSet = EnumSet.copyOf(List.of(Material.values()));
+    private static final Set<Material> materialSet = EnumSet.allOf(Material.class);
 
     public static void fireCannons(Player player, Set<Cannon> cannons, boolean useFiringVector) {
         Vector firingVector = getPlayerFiringVector(player);
