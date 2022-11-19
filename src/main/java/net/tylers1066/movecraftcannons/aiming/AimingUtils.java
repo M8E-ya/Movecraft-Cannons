@@ -78,7 +78,7 @@ public class AimingUtils {
 
     @NotNull
     public static Vector getPlayerTargetVector(Player player) {
-        Location target = player.getTargetBlock(Directors.Transparent, player.getWorld().getViewDistance() * 16).getLocation();
+        Location target = player.getTargetBlock(Directors.Transparent, player.getSendViewDistance() * 16).getLocation();
         // TODO: use per-player no-tick view distance once it has been re-implemented
         Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
         // View blocked by own craft: use non-convergent aiming

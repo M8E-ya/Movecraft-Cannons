@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.tylers1066.movecraftcannons.aiming.AimingUtils;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -69,7 +70,7 @@ public class FiringUtils {
      */
     @NotNull
     public static Vector getPlayerFiringVector(Player player) {
-        Location target = player.getTargetBlock(materialSet, player.getClientViewDistance() * 16).getLocation();
+        Location target = player.getTargetBlock(materialSet, player.getSendViewDistance() * 16).getLocation();
         Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
         // View blocked by own craft: use non-convergent aiming
         if (craft != null && craft.getHitBox().contains(MathUtils.bukkit2MovecraftLoc(target))) {
