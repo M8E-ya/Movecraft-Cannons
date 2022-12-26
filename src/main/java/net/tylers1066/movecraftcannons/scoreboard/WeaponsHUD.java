@@ -199,7 +199,7 @@ public class WeaponsHUD implements Listener {
         return line.build();
     }
 
-    private TextColor getCannonColor(Cannon cannon) {
+    public static TextColor getCannonColor(Cannon cannon) {
         // Destroyed
         if (!cannon.isValid()) {
             return NamedTextColor.RED;

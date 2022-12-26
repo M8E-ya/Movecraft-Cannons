@@ -1,5 +1,6 @@
 package net.tylers1066.movecraftcannons.scoreboard;
 
+import at.pavlov.cannons.cannon.Cannon;
 import me.halfquark.squadronsreloaded.squadron.Squadron;
 import me.halfquark.squadronsreloaded.squadron.SquadronCraft;
 import me.halfquark.squadronsreloaded.squadron.SquadronManager;
@@ -13,6 +14,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
+import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -26,6 +28,9 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
+import java.util.Iterator;
+
+import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
 import static net.tylers1066.movecraftcannons.scoreboard.WeaponsHUD.getHullIntegrityColor;
 
@@ -39,7 +44,7 @@ public class SquadronsHUD implements Listener {
                     updateSquadronsHUD(squadron.getPilot());
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 1L, 20L);
+        }.runTaskTimerAsynchronously(plugin, 1L, 2L);
     }
 
     @EventHandler
@@ -154,7 +159,20 @@ public class SquadronsHUD implements Listener {
         var line = text()
                 .append(text( craft.getType().getStringProperty(CraftType.NAME) + " (" + (craft.getSquadron().getCraftId(craft) + 1) + "): ", color)
                 .append(text(percentage + "%", getHullIntegrityColor(percentage))));
-
+        line.append(space().append(createCannonStatusLine(craft)));
         return line.build();
+    }
+
+    private Component createCannonStatusLine(SquadronCraft craft) {
+        var component = text().append(text("("));
+        Iterator<Cannon> cannonIterator = DetectionListener.getCannonsOnCraft(craft).iterator();
+        while (cannonIterator.hasNext()) {
+            Cannon cannon = cannonIterator.next();
+            component.append(text(cannon.getCannonDesign().getMessageName().substring(0, 3), WeaponsHUD.getCannonColor(cannon)));
+            if (cannonIterator.hasNext()) {
+                component.append(text(" | "));
+            }
+        }
+        return component.append(text(")")).build();
     }
 }
