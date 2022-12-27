@@ -4,7 +4,6 @@ import at.pavlov.cannons.Aiming;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
 import at.pavlov.cannons.utils.CannonsUtil;
-import net.countercraft.movecraft.combat.MovecraftCombat;
 import net.countercraft.movecraft.combat.features.directors.Directors;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
@@ -16,14 +15,15 @@ import net.tylers1066.movecraftcannons.config.Config;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import net.tylers1066.movecraftcannons.localisation.I18nSupport;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class AimingUtils {
 
@@ -78,8 +78,7 @@ public class AimingUtils {
 
     @NotNull
     public static Vector getPlayerTargetVector(Player player) {
-        Location target = player.getTargetBlock(Directors.Transparent, player.getSendViewDistance() * 16).getLocation();
-        // TODO: use per-player no-tick view distance once it has been re-implemented
+        Location target = getTargetBlock(player, Directors.Transparent, player.getSendViewDistance() * 16).getLocation();
         Craft craft = CraftManager.getInstance().getCraftByPlayer(player);
         // View blocked by own craft: use non-convergent aiming
         if (craft != null && craft.getHitBox().contains(MathUtils.bukkit2MovecraftLoc(target))) {
@@ -146,5 +145,23 @@ public class AimingUtils {
             horizontal = horizontal + 360;
 
         return new GunAngles(horizontal, -pitch);
+    }
+
+    // See CraftLivingEntity#getLineOfSight
+    private static Block getTargetBlock(Player player, Set<Material> transparent, int maxDistance) {
+        if (transparent == null) {
+            transparent = EnumSet.of(Material.AIR, Material.CAVE_AIR, Material.VOID_AIR);
+        }
+        maxDistance = Math.min(maxDistance, player.getSendViewDistance() * 16);
+        Block block = null;
+        Iterator<Block> itr = new BlockIterator(player, maxDistance);
+        while (itr.hasNext()) {
+            block = itr.next();
+            Material material = block.getType();
+            if (!transparent.contains(material)) {
+                break;
+            }
+        }
+        return block;
     }
 }
