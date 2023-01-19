@@ -19,10 +19,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class DetectionListener implements Listener {
-    public static HashMap<Craft, LinkedHashSet<Cannon>> cannonsOnCraft = new HashMap<>();
+    public static Map<Craft, LinkedHashSet<Cannon>> cannonsOnCraft = new ConcurrentHashMap<>();
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onCraftDetect(CraftDetectEvent event) {
