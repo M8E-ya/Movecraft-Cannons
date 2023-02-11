@@ -35,8 +35,11 @@ import static net.kyori.adventure.text.Component.text;
 import static net.tylers1066.movecraftcannons.scoreboard.WeaponsHUD.getHullIntegrityColor;
 
 public class SquadronsHUD implements Listener {
+    private final MovecraftCannons plugin;
 
     public SquadronsHUD(MovecraftCannons plugin) {
+        this.plugin = plugin;
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -113,7 +116,13 @@ public class SquadronsHUD implements Listener {
 
     public void updateSquadronsHUD(Player player) {
         if (!SquadronManager.getInstance().hasSquadron(player)) {
-            removeSquadronsHUD(player);
+            // Scoreboard be removed synchronously
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    removeSquadronsHUD(player);
+                }
+            }.runTask(plugin);
             return;
         }
 
@@ -141,11 +150,9 @@ public class SquadronsHUD implements Listener {
 
     public void removeSquadronsHUD(Player player) {
         Scoreboard board = player.getScoreboard();
-        if (board.getObjective("SquadronHUD") == null) {
-            return;
+        if (board.getObjective("SquadronHUD") != null) {
+            player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
         }
-
-        player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
     }
 
     private Component createLine(SquadronCraft craft) {
