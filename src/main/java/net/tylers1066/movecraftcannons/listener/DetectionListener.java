@@ -35,9 +35,11 @@ public class DetectionListener implements Listener {
         }
 
         UUID uuid;
+        boolean isSquadronCraft = false;
         // Squadron crafts: set cannon owner UUIDs to squadron pilot
         if (craft instanceof SquadronCraft squadronCraft) {
             uuid = squadronCraft.getSquadron().getPilot().getUniqueId();
+            isSquadronCraft = true;
         }
         // Subcrafts: only include cannons that are inside the subcraft
         else if (craft instanceof SubCraft subCraft) {
@@ -75,6 +77,12 @@ public class DetectionListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+
+            // We use on the "on ship" setting to relax the allowed firing angles on squadron crafts
+            if (isSquadronCraft) {
+                cannon.setOnShip(true);
+            }
+
             cannon.setOwner(uuid);
             craftFirepower += Config.CannonFirepowerValues.get(cannonName);
             cannonAmountMap.merge(cannonName, 1, Integer::sum);
@@ -99,6 +107,13 @@ public class DetectionListener implements Listener {
 
     @EventHandler
     public void onRelease(CraftReleaseEvent event) {
+        // Mark as not on "a ship" to revert allowed firing angles to normal
+        if (event.getCraft() instanceof SquadronCraft) {
+            for (Cannon cannon : getCannonsOnCraft(event.getCraft())) {
+                cannon.setOnShip(false);
+            }
+        }
+
         cannonsOnCraft.remove(event.getCraft());
     }
 

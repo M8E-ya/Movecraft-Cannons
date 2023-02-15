@@ -136,7 +136,7 @@ public class SquadronsHUD implements Listener {
         obj.displayName(text("Squadron", NamedTextColor.WHITE, TextDecoration.BOLD));
 
         for (SquadronCraft squadCraft : squadron.getCrafts()) {
-            Team team =  hud.getTeam(squadCraft.toString());
+            Team team = hud.getTeam(squadCraft.toString());
             if (team == null)
                 continue;
 
