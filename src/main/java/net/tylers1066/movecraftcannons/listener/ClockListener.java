@@ -47,14 +47,11 @@ public class ClockListener implements Listener {
         // Check if the clock specifies a cannon type to manage
         String selectedCannonType = getSelectedCannonTypeFromItem(item);
 
-        // Check if player is in a squadron.
-        if (SquadronManager.getInstance().hasSquadron(player)) {
-            Squadron squad = SquadronManager.getInstance().getPlayerSquadron(player, true);
-            if (squad == null)
-                return;
+        Squadron squad = SquadronManager.getInstance().getPlayerSquadron(player, true);
+        // Handle squadron aiming and firing
+        if (squad != null) {
             for (SquadronCraft squadCraft: squad.getCrafts()) {
-                var squadCraftCannons = DetectionListener.getCannonsOnCraft(squadCraft);
-                FiringUtils.fireCannons(player, squadCraftCannons, true);
+                runAimingLogic(player, squadCraft, selectedCannonType);
             }
             return;
         }
@@ -64,14 +61,7 @@ public class ClockListener implements Listener {
             return;
         }
 
-        // Right-click - aim
-        AimingUtils.aimCannonsOnCraft(craft, player, selectedCannonType);
-
-        // Aerial crafts will also fire, as well as aim
-        if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
-            var cannons = DetectionListener.getCannonsOnCraft(craft);
-            FiringUtils.fireCannons(player, cannons, true);
-        }
+        runAimingLogic(player, craft, selectedCannonType);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -104,6 +94,7 @@ public class ClockListener implements Listener {
 
         // Check if the clock specifies a cannon type to manage
         String selectedCannonType = getSelectedCannonTypeFromItem(item);
+
         // Filter non-selected cannons
         if (selectedCannonType != null) {
             cannons.removeIf(cannon -> !cannon.getCannonDesign().getMessageName().equals(selectedCannonType));
@@ -130,5 +121,15 @@ public class ClockListener implements Listener {
             }
         }
         return selectedCannonType;
+    }
+
+    private void runAimingLogic(Player pilot, Craft craft, @Nullable String selectedCannonType) {
+        AimingUtils.aimCannonsOnCraft(craft, pilot, selectedCannonType);
+
+        // Aerial crafts will also fire, as well as aim
+        var craftCannons = DetectionListener.getCannonsOnCraft(craft);
+        if (craft.getType().getBoolProperty(CraftType.ALLOW_VERTICAL_MOVEMENT) && !craft.getType().getBoolProperty(CraftType.REQUIRE_WATER_CONTACT)) {
+            FiringUtils.fireCannons(pilot, craftCannons, true);
+        }
     }
 }
