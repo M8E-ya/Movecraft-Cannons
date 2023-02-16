@@ -23,10 +23,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 
 import java.util.Iterator;
 
@@ -91,7 +88,7 @@ public class SquadronsHUD implements Listener {
     public void createSquadronsHUD(Player pilot, Squadron squadron) {
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
 
-        Objective obj = board.registerNewObjective("SquadronHUD", "dummy", text("Squadron", NamedTextColor.WHITE, TextDecoration.BOLD));
+        Objective obj = board.registerNewObjective("SquadronHUD", Criteria.DUMMY, text("Squadron", NamedTextColor.WHITE, TextDecoration.BOLD));
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         int num = 1;
@@ -111,7 +108,13 @@ public class SquadronsHUD implements Listener {
         }
 
         WeaponsHUD.removeWeaponsScoreboard(pilot);
-        pilot.setScoreboard(board);
+        // Delay display by one tick, otherwise it won't show
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                pilot.setScoreboard(board);
+            }
+        }.runTaskLater(plugin, 1L);
     }
 
     public void updateSquadronsHUD(Player player) {

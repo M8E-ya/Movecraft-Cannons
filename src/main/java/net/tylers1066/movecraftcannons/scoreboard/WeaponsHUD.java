@@ -24,10 +24,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -110,7 +107,7 @@ public class WeaponsHUD implements Listener {
         Player pilot = craft.getPilot();
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
 
-        Objective obj = board.registerNewObjective("CraftHUD", "dummy", createHullIntegrityLine(craft));
+        Objective obj = board.registerNewObjective("CraftHUD", Criteria.DUMMY, createHullIntegrityLine(craft));
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         int num = 1;
