@@ -22,23 +22,13 @@ public class I18nSupport {
             langDirectory.mkdirs();
         }
 
-        InputStream stream = null;
 
-        try {
-            stream = new FileInputStream(langDirectory.getAbsolutePath() + "/mc-cannonslang_" + Config.Locale + ".properties");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        if (stream == null) {
+        try (InputStream stream = new FileInputStream(langDirectory.getAbsolutePath() + "/mc-cannonslang_" + Config.Locale + ".properties")) {
+            langFile.load(stream);
+        } catch (IOException ex) {
+            ex.printStackTrace();
             MovecraftCannons.getInstance().getLogger().log(Level.SEVERE, "Critical Error in localisation system!");
             MovecraftCannons.getInstance().getServer().shutdown();
-        }
-
-        try {
-            langFile.load(stream);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
