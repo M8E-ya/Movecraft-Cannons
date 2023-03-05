@@ -9,7 +9,11 @@ import at.pavlov.cannons.event.CannonBeforeCreateEvent;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
 import at.pavlov.cannons.event.CannonFireEvent;
 import net.countercraft.movecraft.craft.Craft;
+import net.countercraft.movecraft.craft.CraftManager;
+import net.countercraft.movecraft.craft.PlayerCraft;
 import net.countercraft.movecraft.craft.type.CraftType;
+import net.countercraft.movecraft.util.BlockHighlight;
+import net.countercraft.movecraft.util.MathUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
@@ -18,16 +22,21 @@ import net.tylers1066.movecraftcannons.utils.MovecraftUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
 public class CannonListener implements Listener {
+    private final Set<BlockFace> HORIZONTAL_BLOCKFACES_NS = EnumSet.of(BlockFace.EAST, BlockFace.WEST);
+
+    private final Set<BlockFace> HORIZONTAL_BLOCKFACES_EW = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH);
     private final BlockFace[] ADJACENT_BLOCKFACES = { BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.DOWN };
     private final EnumSet<Material> BARREL_MATERIALS = EnumSet.of(Material.STONE_BRICK_WALL, Material.CHAIN);
 
@@ -111,20 +120,54 @@ public class CannonListener implements Listener {
     }
 
     private boolean isBlockCovered(Block block, BlockFace originatingFace, UUID player) {
-        int covered = 0;
+        Set<BlockFace> horizontalBlockFaces;
+        if (originatingFace == BlockFace.NORTH || originatingFace == BlockFace.SOUTH) {
+            horizontalBlockFaces = HORIZONTAL_BLOCKFACES_NS;
+        } else if (originatingFace == BlockFace.EAST || originatingFace == BlockFace.WEST) {
+            horizontalBlockFaces = HORIZONTAL_BLOCKFACES_EW;
+        } else {
+            horizontalBlockFaces = Collections.emptySet();
+        }
+
+        List<Block> coveringBlocks = new ArrayList<>();
         for (BlockFace face : ADJACENT_BLOCKFACES) {
             if (face == originatingFace) {
                 continue;
             }
+
             Block adjacentBlock = block.getRelative(face);
             Block aboveBlock = adjacentBlock.getRelative(BlockFace.UP);
-            if (isBlockCovered(adjacentBlock, player)
-                    || isBlockCovered(aboveBlock, player)
-                    || isBlockCovered(aboveBlock.getRelative(BlockFace.UP), player)) {
-                covered++;
+            Block aboveAboveBlock = aboveBlock.getRelative(BlockFace.UP);
+
+            if (isBlockCovered(adjacentBlock, player)) {
+                coveringBlocks.add(adjacentBlock);
             }
 
-            if (covered > 1) {
+            else if (isBlockCovered(aboveBlock, player)) {
+                coveringBlocks.add(aboveBlock);
+            }
+
+            else if (isBlockCovered(aboveAboveBlock, player)) {
+                coveringBlocks.add(aboveAboveBlock);
+            }
+
+            else if (horizontalBlockFaces.contains(face)) {
+                for (int i = 0; i < 4; i++) {
+                    Block relativeHorizontalBlock = block.getRelative(face, i);
+                    if (isBlockCovered(relativeHorizontalBlock, player)) {
+                        tempHighlightBlock(relativeHorizontalBlock, player);
+                        return true;
+                    }
+                    Block relativeHorizontalBlockDown = relativeHorizontalBlock.getRelative(BlockFace.DOWN);
+                    if (isBlockCovered(relativeHorizontalBlockDown, player)) {
+                        tempHighlightBlock(relativeHorizontalBlockDown, player);
+                        return true;
+                    }
+                }
+            }
+
+            if (coveringBlocks.size() > 1) {
+                tempHighlightBlock(coveringBlocks.get(1), player);
                 return true;
             }
         }
@@ -142,4 +185,17 @@ public class CannonListener implements Listener {
         }
     }
 
+    private void tempHighlightBlock(Block block, UUID playerUUID) {
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null) {
+            return;
+        }
+
+        PlayerCraft craft = CraftManager.getInstance().getCraftByPlayer(player);
+        if (craft != null) {
+            BlockHighlight.tempHighlightCraftBlockAt(MathUtils.bukkit2MovecraftLoc(block.getLocation()), craft);
+        } else {
+            player.spawnParticle(Particle.CAMPFIRE_SIGNAL_SMOKE, block.getLocation(), 1);
+        }
+    }
 }
