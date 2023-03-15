@@ -3,11 +3,13 @@ package net.tylers1066.movecraftcannons.listener;
 import at.pavlov.cannons.API.CannonsAPI;
 import at.pavlov.cannons.Cannons;
 import at.pavlov.cannons.cannon.Cannon;
+import at.pavlov.cannons.cannon.CannonDesign;
 import at.pavlov.cannons.cannon.CannonManager;
 import at.pavlov.cannons.event.CannonAfterCreateEvent;
 import at.pavlov.cannons.event.CannonBeforeCreateEvent;
 import at.pavlov.cannons.event.CannonDestroyedEvent;
 import at.pavlov.cannons.event.CannonFireEvent;
+import com.google.common.base.Enums;
 import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PlayerCraft;
@@ -25,6 +27,7 @@ import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -32,13 +35,23 @@ import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CannonListener implements Listener {
     private final Set<BlockFace> HORIZONTAL_BLOCKFACES_NS = EnumSet.of(BlockFace.EAST, BlockFace.WEST);
 
     private final Set<BlockFace> HORIZONTAL_BLOCKFACES_EW = EnumSet.of(BlockFace.NORTH, BlockFace.SOUTH);
     private final BlockFace[] ADJACENT_BLOCKFACES = { BlockFace.UP, BlockFace.EAST, BlockFace.WEST, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.DOWN };
-    private final EnumSet<Material> BARREL_MATERIALS = EnumSet.of(Material.STONE_BRICK_WALL, Material.CHAIN);
+    private final Set<Material> BARREL_MATERIALS = EnumSet.of(Material.STONE_BRICK_WALL, Material.CHAIN);
+
+    private final Set<Material> ALL_BARREL_MATERIALS = EnumSet.noneOf(Material.class);
+
+    public CannonListener() {
+        for (CannonDesign design: Cannons.getPlugin().getDesignStorage().getCannonDesignList()) {
+            ALL_BARREL_MATERIALS.addAll(design.getSchematicBlockTypeProtected().stream().map(BlockData::getMaterial).toList());
+        }
+    }
+
 
     @EventHandler
     public void beforeCannonCreate(CannonBeforeCreateEvent event) {
@@ -175,7 +188,10 @@ public class CannonListener implements Listener {
     }
 
     private boolean isBlockCovered(Block block, UUID player) {
-        return !block.getType().isAir() && Cannons.getPlugin().getCannonManager().getCannon(block.getLocation(), player) == null;
+        Material type = block.getType();
+        return !type.isAir()
+                && !ALL_BARREL_MATERIALS.contains(type)
+                && Cannons.getPlugin().getCannonManager().getCannon(block.getLocation(), player) == null;
     }
 
     private void sendMessageToCannonOperator(Cannon cannon, UUID operator, Component message) {
