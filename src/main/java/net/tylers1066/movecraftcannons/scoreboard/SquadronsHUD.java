@@ -29,7 +29,7 @@ import java.util.Iterator;
 
 import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
-import static net.tylers1066.movecraftcannons.scoreboard.WeaponsHUD.getHullIntegrityColor;
+import static net.tylers1066.movecraftcannons.scoreboard.WeaponsHUD.*;
 
 public class SquadronsHUD implements Listener {
     private final MovecraftCannons plugin;
@@ -159,16 +159,11 @@ public class SquadronsHUD implements Listener {
     }
 
     private Component createLine(SquadronCraft craft) {
-        int percentage = (int) (((double) craft.getTotalNonNegligibleBlocks() / (double) craft.getOrigBlockCount()) * 100);
-        if (percentage == 0) {
-            // The hull integrity would otherwise momentarily be 0% after the craft is piloted.
-            percentage = 100;
-        }
-
+        int hullIntegrity = getHullIntegrity(craft);
         var color = (craft.isLead()) ? NamedTextColor.AQUA : NamedTextColor.WHITE;
         var line = text()
                 .append(text( craft.getType().getStringProperty(CraftType.NAME) + " (" + (craft.getSquadron().getCraftId(craft) + 1) + "): ", color)
-                .append(text(percentage + "%", getHullIntegrityColor(percentage))));
+                .append(text(hullIntegrity + "%", getHullIntegrityColor(hullIntegrity, getSinkingHullIntegrity(craft)))));
         line.append(space().append(createCannonStatusLine(craft)));
         return line.build();
     }

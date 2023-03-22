@@ -6,6 +6,7 @@ import net.countercraft.movecraft.craft.Craft;
 import net.countercraft.movecraft.craft.CraftManager;
 import net.countercraft.movecraft.craft.PilotedCraft;
 import net.countercraft.movecraft.craft.PlayerCraft;
+import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
@@ -183,16 +184,10 @@ public class WeaponsHUD implements Listener {
     }
 
     private Component createHullIntegrityLine(Craft craft) {
-        int percentage = (int) (((double) craft.getTotalNonNegligibleBlocks() / (double) craft.getOrigBlockCount()) * 100);
-        if (percentage == 0) {
-            // The hull integrity would otherwise momentarily be 0% after the craft is piloted.
-            percentage = 100;
-        }
-
+        int hullIntegrity = getHullIntegrity(craft);
         var line = Component.text()
                 .append(Component.text("Hull Integrity: ", NamedTextColor.WHITE, TextDecoration.BOLD))
-                .append(Component.text(percentage + "%", getHullIntegrityColor(percentage)));
-
+                .append(Component.text(hullIntegrity + "%", getHullIntegrityColor(hullIntegrity, getSinkingHullIntegrity(craft))));
         return line.build();
     }
 
@@ -219,14 +214,45 @@ public class WeaponsHUD implements Listener {
         }
     }
 
-    public static TextColor getHullIntegrityColor(int percentage) {
-        if (percentage <= 100 && percentage >= 80) {
+    public static TextColor getHullIntegrityColor(int percentage, double sinkPercentage) {
+        if (percentage >= sinkPercentage + 20) {
             return NamedTextColor.GREEN;
         }
-        else if (percentage < 80 && percentage >= 70) {
+        else if (percentage >= sinkPercentage + 10) {
             return NamedTextColor.YELLOW;
         }
         return NamedTextColor.RED;
+    }
+
+    public static int getHullIntegrity(Craft craft) {
+        int percentageBlocksLeft;
+        double overallSinkPercent = craft.getType().getDoubleProperty(CraftType.OVERALL_SINK_PERCENT);
+
+        if (overallSinkPercent == 0) {
+            percentageBlocksLeft = (int) Math.round(craft.getCachedFlyBlockPercent());
+        } else {
+            percentageBlocksLeft = (int) Math.round((((double) craft.getTotalNonNegligibleBlocks() / (double) craft.getOrigBlockCount()) * 100));
+        }
+
+        if (percentageBlocksLeft == 0) {
+            // The hull integrity would otherwise momentarily be 0% after the craft is piloted.
+            percentageBlocksLeft = 100;
+        }
+
+        return percentageBlocksLeft;
+    }
+
+    // Find the percentage at which the craft will really sink
+    public static double getSinkingHullIntegrity(Craft craft) {
+        double sinkingPercentage;
+        double overallSinkPercent = craft.getType().getDoubleProperty(CraftType.OVERALL_SINK_PERCENT);
+
+        if (overallSinkPercent == 0) {
+            sinkingPercentage = craft.getType().getDoubleProperty(CraftType.SINK_PERCENT);
+        } else {
+            sinkingPercentage = overallSinkPercent;
+        }
+        return sinkingPercentage;
     }
 
 
