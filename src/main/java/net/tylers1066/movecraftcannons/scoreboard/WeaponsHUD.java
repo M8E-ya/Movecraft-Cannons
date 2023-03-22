@@ -10,10 +10,14 @@ import net.countercraft.movecraft.craft.type.CraftType;
 import net.countercraft.movecraft.events.CraftDetectEvent;
 import net.countercraft.movecraft.events.CraftReleaseEvent;
 import net.countercraft.movecraft.events.CraftSinkEvent;
+import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.tylers1066.movecraftcannons.MovecraftCannons;
 import net.tylers1066.movecraftcannons.listener.DetectionListener;
 import org.bukkit.Bukkit;
@@ -27,24 +31,25 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.minimessage.tag.resolver.Placeholder.parsed;
 
 public class WeaponsHUD implements Listener {
-    private static final Set<UUID> weaponScoreboardPlayers = new HashSet<>();
+    private static final Map<UUID, BossBar> weaponScoreboardPlayers = new HashMap<>();
 
     public WeaponsHUD(MovecraftCannons plugin) {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for (UUID uuid: weaponScoreboardPlayers) {
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player == null)
+                for (Map.Entry<UUID, BossBar> entry: weaponScoreboardPlayers.entrySet()) {
+                    Player player = Bukkit.getPlayer(entry.getKey());
+                    if (player == null) {
                         continue;
+                    }
 
-                    updateWeaponsScoreboard(player);
+                    updateWeaponsScoreboard(player, entry.getValue());
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 1L, 2L);
@@ -84,7 +89,7 @@ public class WeaponsHUD implements Listener {
 
             Team team = pcraft.getPilot().getScoreboard().getTeam(cannon.getUID().toString().substring(0, 15));
             if (team != null) {
-                team.prefix(Component.text(cannon.getCannonDesign().getMessageName(), NamedTextColor.DARK_RED, TextDecoration.STRIKETHROUGH));
+                team.prefix(text(cannon.getCannonDesign().getMessageName(), NamedTextColor.DARK_RED, TextDecoration.STRIKETHROUGH));
             }
         }
     }
@@ -108,7 +113,7 @@ public class WeaponsHUD implements Listener {
         Player pilot = craft.getPilot();
         Scoreboard board = Bukkit.getScoreboardManager().getNewScoreboard();
 
-        Objective obj = board.registerNewObjective("CraftHUD", Criteria.DUMMY, createHullIntegrityLine(craft));
+        Objective obj = board.registerNewObjective("CraftHUD", Criteria.DUMMY, text("Weapons", NamedTextColor.WHITE, TextDecoration.BOLD));
         obj.setDisplaySlot(DisplaySlot.SIDEBAR);
 
         int num = 1;
@@ -126,11 +131,14 @@ public class WeaponsHUD implements Listener {
             num++;
         }
 
-        weaponScoreboardPlayers.add(pilot.getUniqueId());
+        BossBar bossBar = createBossBar(craft);
+        pilot.showBossBar(bossBar);
+
+        weaponScoreboardPlayers.put(pilot.getUniqueId(), bossBar);
         pilot.setScoreboard(board);
     }
 
-    public void updateWeaponsScoreboard(Player player) {
+    public void updateWeaponsScoreboard(Player player, BossBar bossBar) {
         PilotedCraft craft = CraftManager.getInstance().getCraftByPlayer(player);
         if (craft == null || player != craft.getPilot())
             return;
@@ -141,7 +149,6 @@ public class WeaponsHUD implements Listener {
         if (obj == null) {
             return;
         }
-        obj.displayName(createHullIntegrityLine(craft));
 
         LinkedHashSet<Cannon> cannons = DetectionListener.getCannonsOnCraft(craft);
         if (cannons.isEmpty()) {
@@ -159,6 +166,8 @@ public class WeaponsHUD implements Listener {
 
             team.prefix(newLine);
         }
+
+        updateBossBar(craft, bossBar, getHullIntegrity(craft), getSinkingHullIntegrity(craft));
     }
 
     public static void removeWeaponsScoreboard(Player player) {
@@ -168,16 +177,17 @@ public class WeaponsHUD implements Listener {
         }
 
         player.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
-        weaponScoreboardPlayers.remove(player.getUniqueId());
+        BossBar bossBar = weaponScoreboardPlayers.remove(player.getUniqueId());
+        player.hideBossBar(bossBar);
     }
 
     private Component createCannonLine(Cannon cannon) {
-        var line = Component.text()
-                .append(Component.text(cannon.getCannonDesign().getMessageName(), getCannonColor(cannon)))
-                .append(Component.text(" (" + shortenBlockFace(cannon.getCannonDirection()) + ")", NamedTextColor.WHITE));
+        var line = text()
+                .append(text(cannon.getCannonDesign().getMessageName(), getCannonColor(cannon)))
+                .append(text(" (" + shortenBlockFace(cannon.getCannonDirection()) + ")", NamedTextColor.WHITE));
 
         if (cannon.isLoaded() && cannon.getChargesRemaining() > 1) {
-            line.append(Component.text(" - " + cannon.getChargesRemaining() + " charges", NamedTextColor.WHITE));
+            line.append(text(" - " + cannon.getChargesRemaining() + " charges", NamedTextColor.WHITE));
         }
 
         return line.build();
@@ -185,9 +195,9 @@ public class WeaponsHUD implements Listener {
 
     private Component createHullIntegrityLine(Craft craft) {
         int hullIntegrity = getHullIntegrity(craft);
-        var line = Component.text()
-                .append(Component.text("Hull Integrity: ", NamedTextColor.WHITE, TextDecoration.BOLD))
-                .append(Component.text(hullIntegrity + "%", getHullIntegrityColor(hullIntegrity, getSinkingHullIntegrity(craft))));
+        var line = text()
+                .append(text("Hull Integrity: ", NamedTextColor.WHITE, TextDecoration.BOLD))
+                .append(text(hullIntegrity + "%", getHullIntegrityColor(hullIntegrity, getSinkingHullIntegrity(craft))));
         return line.build();
     }
 
@@ -214,7 +224,7 @@ public class WeaponsHUD implements Listener {
         }
     }
 
-    public static TextColor getHullIntegrityColor(int percentage, double sinkPercentage) {
+    public static NamedTextColor getHullIntegrityColor(int percentage, double sinkPercentage) {
         if (percentage >= sinkPercentage + 20) {
             return NamedTextColor.GREEN;
         }
@@ -255,7 +265,6 @@ public class WeaponsHUD implements Listener {
         return sinkingPercentage;
     }
 
-
     private String shortenBlockFace(BlockFace face) {
         return switch (face) {
             case NORTH -> "N";
@@ -264,5 +273,48 @@ public class WeaponsHUD implements Listener {
             case EAST -> "E";
             default -> face.name();
         };
+    }
+
+    private BossBar createBossBar(Craft craft) {
+        return BossBar.bossBar(
+                MiniMessage.miniMessage().deserialize("Hull Integrity: <integrity> | Fuel: <range> blocks", TagResolver.resolver(
+                        parsed("integrity", String.valueOf(getHullIntegrity(craft))),
+                        parsed("range", String.valueOf(craft.getCachedFuelRange())))
+                ),
+                1f,
+                BossBar.Color.GREEN,
+                BossBar.Overlay.NOTCHED_20
+        );
+    }
+
+    private void updateBossBar(Craft craft, BossBar bossBar, int hullIntegrity, double sinkingHullIntegrity) {
+        BossBar.Color colour = getBossBarColour(getHullIntegrityColor(hullIntegrity, sinkingHullIntegrity));
+        bossBar.color(colour);
+        if (colour == BossBar.Color.RED) {
+            bossBar.addFlag(BossBar.Flag.DARKEN_SCREEN);
+        }
+        bossBar.progress(1 - (float) ((float) (100 - hullIntegrity) / (100 - sinkingHullIntegrity)));
+        bossBar.name(getBossBarText(craft));
+    }
+
+    private Component getBossBarText(Craft craft) {
+        return MiniMessage.miniMessage().deserialize("<integrity> <white>| <b>Fuel</b>: <aqua><range></aqua> blocks",
+                TagResolver.resolver(
+                        Placeholder.component("integrity", createHullIntegrityLine(craft)),
+                        Placeholder.parsed("range", String.valueOf(craft.getCachedFuelRange()))
+                )
+        );
+    }
+
+    private BossBar.Color getBossBarColour(NamedTextColor hullIntegrityColour) {
+        if (hullIntegrityColour == NamedTextColor.RED) {
+            return BossBar.Color.RED;
+        } else if (hullIntegrityColour == NamedTextColor.YELLOW) {
+            return BossBar.Color.YELLOW;
+        } else if (hullIntegrityColour == NamedTextColor.GREEN) {
+            return BossBar.Color.GREEN;
+        } else {
+            return BossBar.Color.WHITE;
+        }
     }
 }
